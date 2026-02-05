@@ -1,7 +1,13 @@
 [package]
-name = "axum-scaffold"
+name = "create-axum-app"
 version = "0.1.0"
 edition = "2024"
+description = "A command-line tool to quickly create Axum web applications"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Yu-Xiao-Sheng/create-axum-app"
+readme = "README.md"
+keywords = ["axum", "cli", "web", "scaffolding", "rust"]
+categories = ["command-line-utilities", "web-programming"]
 
 [lib]
 path = "src/lib.rs"
