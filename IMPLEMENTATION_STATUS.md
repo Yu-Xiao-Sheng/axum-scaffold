@@ -1,4 +1,4 @@
-# Implementation Status: create-axum-app CLI Tool
+# Implementation Status: axum-app-create CLI Tool
 
 **Last Updated**: 2025-02-06  
 **Branch**: `001-cli-mvp`  
