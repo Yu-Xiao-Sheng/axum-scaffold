@@ -34,7 +34,8 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive:
                  💡 修复建议 / Fix:\n\
                  - 删除现有目录 / Remove existing directory: rm -rf {}\n\
                  - 使用不同的名称 / Use a different name\n\
-                 - 如果确认要覆盖，请使用 --force 标志 / If you want to overwrite, use --force flag",
+                 - 如果确认要覆盖，请使用 --force 标志 / If you want to overwrite, use --force flag\n\
+                 - 查看帮助 / View help: axum-app-create --help",
                 project_dir.display(),
                 project_dir.display()
             )));
@@ -132,6 +133,7 @@ fn handle_permission_error(error: std::io::Error, path: &Path) -> Result<()> {
                  3. 使用临时目录 / Use temp directory: /tmp/my-project\n\
                  4. 检查目录权限 / Check directory permissions: ls -la {}\n\
                  5. 使用sudo（不推荐）/ Use sudo (not recommended): sudo axum-app-create\n\n\
+                 📖 查看帮助 / View help: axum-app-create --help\n\n\
                  ❌ 错误详情 / Error: {}",
                 path.display(),
                 path.parent().map(|p| p.display().to_string()).unwrap_or_else(|| ".".to_string()),

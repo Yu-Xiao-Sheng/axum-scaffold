@@ -38,7 +38,8 @@ fn format_error_message(error: &CliError) -> String {
                  1. 检查文件系统权限 / Check file system permissions\n\
                  2. 确保磁盘空间充足 / Ensure sufficient disk space\n\
                  3. 查看日志获取更多信息 / Check logs for more details: RUST_LOG=debug\n\
-                 4. 提交bug报告 / Report bug: https://github.com/yourusername/axum-app-create/issues",
+                 4. 查看帮助 / View help: axum-app-create --help\n\
+                 5. 提交bug报告 / Report bug: https://github.com/yourusername/axum-app-create/issues",
                 error
             )
         }

@@ -41,7 +41,8 @@ pub fn check_rust_toolchain() -> Result<()> {
                  最低要求 / Minimum required: {}\n\n\
                  💡 修复建议 / Fix: 更新Rust工具链 / Update Rust toolchain\n\
                  💻 更新命令 / Update command: rustup update\n\
-                 📖 文档链接 / Documentation: https://rust-lang.github.io/rustup/",
+                 📖 文档链接 / Documentation: https://rust-lang.github.io/rustup/\n\
+                 📖 查看帮助 / View help: axum-app-create --help",
                 version_str, MIN_RUST_VERSION
             )));
         }
@@ -72,7 +73,8 @@ fn check_command(command: &str, args: &[&str]) -> Result<String> {
                     "❌ {} 命令执行失败 / command failed with non-zero exit code\n\n\
                      💡 修复建议 / Fix: 检查Rust工具链是否正确安装 / Check if Rust toolchain is properly installed\n\
                      📦 安装指南 / Installation guide: https://rustup.rs/\n\
-                     🔧 验证安装 / Verify installation: {} --version",
+                     🔧 验证安装 / Verify installation: {} --version\n\
+                     📖 查看帮助 / View help: axum-app-create --help",
                     command, command
                 )))
             }
@@ -84,6 +86,7 @@ fn check_command(command: &str, args: &[&str]) -> Result<String> {
                  📦 安装链接 / Installation link: https://rustup.rs/\n\
                  💻 安装命令 / Installation command:\n\
                     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh\n\n\
+                 📖 查看帮助 / View help: axum-app-create --help\n\n\
                  ❌ 错误详情 / Error details: {}",
                 command, command, e
             )))

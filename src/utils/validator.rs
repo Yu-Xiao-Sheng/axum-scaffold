@@ -47,7 +47,8 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
         return Err(
             "❌ 项目名称不能为空 / Project name cannot be empty\n\n\
              💡 修复建议 / Fix: 提供一个有效的项目名称 / Provide a valid project name\n\
-             ✅ 好的示例 / Good examples: my-app, my_app, awesome-project".to_string()
+             ✅ 好的示例 / Good examples: my-app, my_app, awesome-project\n\n\
+             📖 查看帮助 / View help: axum-app-create --help".to_string()
         );
     }
 
@@ -57,7 +58,8 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
         return Err(format!(
             "❌ 项目名称太长（{}个字符，最大100）/ Project name too long ({} chars, max 100)\n\n\
              💡 修复建议 / Fix: 使用更短的名称 / Use a shorter name\n\
-             ✅ 好的示例 / Good example: {} (前10个字符 / first 10 chars)",
+             ✅ 好的示例 / Good example: {} (前10个字符 / first 10 chars)\n\n\
+             📖 查看帮助 / View help: axum-app-create --help",
             name.len(),
             name.len(),
             preview
@@ -69,7 +71,8 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
         return Err(
             "❌ 项目名称不能以数字开头 / Project name cannot start with a digit\n\n\
              💡 修复建议 / Fix: 在数字前添加字母 / Add letters before the digit\n\
-             ✅ 好的示例 / Good example: project123 → project123".to_string()
+             ✅ 好的示例 / Good example: project123 → project123\n\n\
+             📖 查看帮助 / View help: axum-app-create --help".to_string()
         );
     }
 
@@ -81,7 +84,8 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
              💡 修复建议 / Fix: 使用同义词或添加前缀/后缀 / Use a synonym or add prefix/suffix\n\
              ✅ 好的示例 / Good examples:\n\
               - '{}' → 'my_{}' 或 / or 'my-{}-cli'\n\
-              - '{}' → 'setup_{}' 或 / or '{}-tool'",
+              - '{}' → 'setup_{}' 或 / or '{}-tool'\n\n\
+             📖 查看帮助 / View help: axum-app-create --help",
             name,              // The keyword itself
             name, name, name,   // First example: {name} → my_{name} or my-{name}-cli
             name, name, name    // Second example: {name} → setup_{name} or {name}-tool
@@ -102,7 +106,8 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
              ✅ 好的示例 / Good example:\n\
               - 'my @ app' → 'my_at_app'\n\
               - 'my@project' → 'my_project'\n\
-              - 'my.project' → 'my_project'",
+              - 'my.project' → 'my_project'\n\n\
+             📖 查看帮助 / View help: axum-app-create --help",
             invalid_str,
             invalid_str
         ));
@@ -116,7 +121,8 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
              ✅ 好的示例 / Good examples:\n\
               - '-project' → 'my-project'\n\
               - '_app' → 'my_app'\n\
-              - '-123' → 'app-123'".to_string()
+              - '-123' → 'app-123'\n\n\
+             📖 查看帮助 / View help: axum-app-create --help".to_string()
         );
     }
 

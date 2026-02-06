@@ -64,7 +64,8 @@ impl TemplateEngine {
                      💡 修复建议 / Fix:\n\
                      1. 检查模板语法是否正确 / Check template syntax\n\
                      2. 确认所有变量都在上下文中定义 / Ensure all variables are defined in context\n\
-                     3. 查看完整错误信息 / See full error message below\n\n\
+                     3. 查看完整错误信息 / See full error message below\n\
+                     4. 查看帮助 / View help: axum-app-create --help\n\n\
                      ❌ 错误详情 / Error details:\n\
                      {}",
                     template_name, line_info, error_msg
@@ -84,6 +85,7 @@ impl TemplateEngine {
                 "❌ 模板注册失败 / Template registration failed\n\n\
                  📄 模板名称 / Template name: {}\n\n\
                  💡 修复建议 / Fix: 检查模板语法 / Check template syntax\n\n\
+                 📖 查看帮助 / View help: axum-app-create --help\n\n\
                  ❌ 错误详情 / Error: {}",
                 name, e
             )))
@@ -109,6 +111,7 @@ impl TemplateEngine {
                     "❌ 模板渲染失败 / Template rendering failed\n\n\
                      📄 模板名称 / Template name: {}\n\
                      📍 位置 / Line: {}\n\n\
+                     📖 查看帮助 / View help: axum-app-create --help\n\n\
                      ❌ 错误详情 / Error: {}",
                     name, line_info, error_msg
                 ))
