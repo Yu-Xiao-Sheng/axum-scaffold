@@ -18,7 +18,7 @@ fn test_generate_basic_project() {
         ..Default::default()
     };
 
-    let result = generate_project(&project_dir, &config);
+    let result = generate_project(&project_dir, &config, false);
     assert!(result.is_ok(), "Project generation failed: {:?}", result.err());
 
     // Verify project directory exists
@@ -60,7 +60,7 @@ fn test_generated_project_compiles() {
     };
 
     // Generate project
-    let result = generate_project(&project_dir, &config);
+    let result = generate_project(&project_dir, &config, false);
     assert!(result.is_ok(), "Project generation failed: {:?}", result.err());
 
     // Run cargo check
@@ -104,7 +104,7 @@ fn test_health_endpoint_exists() {
     };
 
     // Generate project
-    let result = generate_project(&project_dir, &config);
+    let result = generate_project(&project_dir, &config, false);
     assert!(result.is_ok(), "Project generation failed: {:?}", result.err());
 
     // Verify health.rs exists and contains correct endpoint
@@ -135,7 +135,7 @@ fn test_gitignore_patterns() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config).unwrap();
+    generate_project(&project_dir, &config, false).unwrap();
 
     let gitignore = project_dir.join(".gitignore");
     let content = std::fs::read_to_string(&gitignore).unwrap();
@@ -157,7 +157,7 @@ fn test_readme_bilingual() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config).unwrap();
+    generate_project(&project_dir, &config, false).unwrap();
 
     let readme = project_dir.join("README.md");
     let content = std::fs::read_to_string(&readme).unwrap();
@@ -184,7 +184,7 @@ fn test_database_feature() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config).unwrap();
+    generate_project(&project_dir, &config, false).unwrap();
 
     // Verify db.rs exists
     assert!(project_dir.join("src/db.rs").exists());
@@ -218,7 +218,7 @@ fn test_auth_feature() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config).unwrap();
+    generate_project(&project_dir, &config, false).unwrap();
 
     // Verify auth handler exists
     assert!(project_dir.join("src/handlers/auth.rs").exists());
@@ -250,7 +250,7 @@ fn test_biz_error_feature() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config).unwrap();
+    generate_project(&project_dir, &config, false).unwrap();
 
     // Verify biz_errors.yaml exists
     assert!(project_dir.join("biz_errors.yaml").exists());
@@ -280,7 +280,7 @@ fn test_multiple_features() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config).unwrap();
+    generate_project(&project_dir, &config, false).unwrap();
 
     // Verify all feature files exist
     assert!(project_dir.join("src/db.rs").exists());

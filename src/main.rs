@@ -62,7 +62,7 @@ fn main() -> anyhow::Result<()> {
     let project_dir = PathBuf::from(&config.project_name);
 
     // Generate project
-    match generate_project(&project_dir, &config) {
+    match generate_project(&project_dir, &config, interactive) {
         Ok(()) => {
             // Print success message
             let message = get_success_message(&project_dir, &config.project_name);

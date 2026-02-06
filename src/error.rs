@@ -27,6 +27,9 @@ pub enum CliError {
 
     #[error("Validation error: {0}")]
     ValidationError(String),
+
+    #[error("Prompt error: {0}")]
+    PromptError(#[from] inquire::InquireError),
 }
 
 /// Result type alias for CLI operations

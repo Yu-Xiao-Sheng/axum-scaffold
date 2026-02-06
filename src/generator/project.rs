@@ -19,21 +19,64 @@ use std::path::Path;
 /// # Arguments
 /// * `project_dir` - Path where the project should be created
 /// * `config` - Project configuration
+/// * `interactive` - Whether to prompt for user input on conflicts
 ///
 /// # Returns
 /// * `Ok(())` if generation succeeded
 /// * `Err(CliError)` if generation failed
-pub fn generate_project(project_dir: &Path, config: &ProjectConfig) -> Result<()> {
+pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive: bool) -> Result<()> {
     // Validate project directory doesn't exist
     if project_dir.exists() {
-        return Err(CliError::Generation(format!(
-            "Directory '{}' already exists",
-            project_dir.display()
-        )));
+        // In non-interactive mode, fail immediately
+        if !interactive {
+            return Err(CliError::Generation(format!(
+                "❌ 目录已存在 / Directory already exists: '{}'\n\n\
+                 💡 修复建议 / Fix:\n\
+                 - 删除现有目录 / Remove existing directory: rm -rf {}\n\
+                 - 使用不同的名称 / Use a different name\n\
+                 - 如果确认要覆盖，请使用 --force 标志 / If you want to overwrite, use --force flag",
+                project_dir.display(),
+                project_dir.display()
+            )));
+        }
+
+        // In interactive mode, prompt for action
+        println!("\n⚠️  警告 / Warning: 目录已存在 / Directory already exists: '{}'", project_dir.display());
+        println!("📁 位置 / Location: {}", project_dir.display());
+        println!();
+
+        // Use inquire for user choice
+        let options = vec![
+            "覆盖 / Overwrite - Delete existing directory and regenerate",
+            "取消 / Cancel - Abort project generation",
+            "重命名 / Rename - Keep existing directory, use different name",
+        ];
+
+        let ans = inquire::Select::new("请选择操作 / Choose an action:", options)
+            .prompt()?;
+
+        match ans {
+            "覆盖 / Overwrite - Delete existing directory and regenerate" => {
+                println!("🗑️  正在删除现有目录 / Deleting existing directory...");
+                std::fs::remove_dir_all(project_dir)?;
+                println!("✓ 已删除 / Deleted");
+            }
+            "取消 / Cancel - Abort project generation" => {
+                println!("❌ 已取消 / Aborted");
+                return Err(CliError::Generation("项目生成已取消 / Project generation cancelled by user".to_string()));
+            }
+            "重命名 / Rename - Keep existing directory, use different name" => {
+                println!("❌ 请使用不同的项目名称重新运行 / Please run again with a different project name");
+                return Err(CliError::Generation("请使用不同的项目名称 / Please use a different project name".to_string()));
+            }
+            _ => {
+                return Err(CliError::Generation("无效选择 / Invalid choice".to_string()));
+            }
+        }
     }
 
-    println!("\n🚀 Creating project: {}", config.project_name);
-    println!("📁 Location: {}", project_dir.display());
+    println!("\n🚀 正在创建项目 / Creating project: {}", config.project_name);
+    println!("📁 位置 / Location: {}", project_dir.display());
 
     // Create project directory
     std::fs::create_dir_all(project_dir)?;
@@ -161,7 +204,7 @@ mod tests {
         let mut config = ProjectConfig::default();
         config.project_name = "my-test-app".to_string();
 
-        let result = generate_project(&project_dir, &config);
+        let result = generate_project(&project_dir, &config, false);
 
         if let Err(e) = &result {
             eprintln!("Generation error: {:?}", e);
