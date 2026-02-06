@@ -166,3 +166,138 @@ fn test_readme_bilingual() {
     assert!(content.contains("Quick Start") || content.contains("快速开始"));
     assert!(content.contains("cargo run"));
 }
+
+/// T060: Integration test - generate project with database feature
+#[test]
+fn test_database_feature() {
+    use axum_app_create::config::{DatabaseOption, FeatureSet};
+
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("db-test-app");
+
+    let config = ProjectConfig {
+        project_name: "db-test-app".to_string(),
+        features: FeatureSet {
+            database: DatabaseOption::PostgreSQL,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    generate_project(&project_dir, &config).unwrap();
+
+    // Verify db.rs exists
+    assert!(project_dir.join("src/db.rs").exists());
+
+    // Verify migrations directory exists
+    assert!(project_dir.join("migrations/001_initial.sql").exists());
+
+    // Verify Cargo.toml contains sqlx dependency
+    let cargo_toml = std::fs::read_to_string(project_dir.join("Cargo.toml")).unwrap();
+    assert!(cargo_toml.contains("sqlx"));
+
+    // Verify .env.example contains DATABASE_URL
+    let env_example = std::fs::read_to_string(project_dir.join(".env.example")).unwrap();
+    assert!(env_example.contains("DATABASE_URL"));
+}
+
+/// T061: Integration test - generate project with authentication feature
+#[test]
+fn test_auth_feature() {
+    use axum_app_create::config::FeatureSet;
+
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("auth-test-app");
+
+    let config = ProjectConfig {
+        project_name: "auth-test-app".to_string(),
+        features: FeatureSet {
+            authentication: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    generate_project(&project_dir, &config).unwrap();
+
+    // Verify auth handler exists
+    assert!(project_dir.join("src/handlers/auth.rs").exists());
+
+    // Verify Cargo.toml contains auth dependencies
+    let cargo_toml = std::fs::read_to_string(project_dir.join("Cargo.toml")).unwrap();
+    assert!(cargo_toml.contains("jsonwebtoken"));
+    assert!(cargo_toml.contains("bcrypt"));
+
+    // Verify .env.example contains JWT_SECRET
+    let env_example = std::fs::read_to_string(project_dir.join(".env.example")).unwrap();
+    assert!(env_example.contains("JWT_SECRET"));
+}
+
+/// T062: Integration test - generate project with biz-error feature
+#[test]
+fn test_biz_error_feature() {
+    use axum_app_create::config::FeatureSet;
+
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("bizerror-test-app");
+
+    let config = ProjectConfig {
+        project_name: "bizerror-test-app".to_string(),
+        features: FeatureSet {
+            biz_error: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    generate_project(&project_dir, &config).unwrap();
+
+    // Verify biz_errors.yaml exists
+    assert!(project_dir.join("biz_errors.yaml").exists());
+
+    // Verify it contains error definitions in both English and Chinese
+    let biz_errors = std::fs::read_to_string(project_dir.join("biz_errors.yaml")).unwrap();
+    assert!(biz_errors.contains("en:"));
+    assert!(biz_errors.contains("zh:"));
+}
+
+/// T063: Integration test - generate project with multiple features
+#[test]
+fn test_multiple_features() {
+    use axum_app_create::config::{DatabaseOption, FeatureSet};
+
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("multi-test-app");
+
+    let config = ProjectConfig {
+        project_name: "multi-test-app".to_string(),
+        features: FeatureSet {
+            database: DatabaseOption::Both,
+            authentication: true,
+            logging: true,
+            biz_error: true,
+        },
+        ..Default::default()
+    };
+
+    generate_project(&project_dir, &config).unwrap();
+
+    // Verify all feature files exist
+    assert!(project_dir.join("src/db.rs").exists());
+    assert!(project_dir.join("src/handlers/auth.rs").exists());
+    assert!(project_dir.join("migrations/001_initial.sql").exists());
+    assert!(project_dir.join("biz_errors.yaml").exists());
+
+    // Verify Cargo.toml contains all dependencies
+    let cargo_toml = std::fs::read_to_string(project_dir.join("Cargo.toml")).unwrap();
+    assert!(cargo_toml.contains("sqlx"));
+    assert!(cargo_toml.contains("jsonwebtoken"));
+    assert!(cargo_toml.contains("tracing"));
+
+    // Verify .env.example contains all config variables
+    let env_example = std::fs::read_to_string(project_dir.join(".env.example")).unwrap();
+    assert!(env_example.contains("DATABASE_URL"));
+    assert!(env_example.contains("JWT_SECRET"));
+    assert!(env_example.contains("LOG_LEVEL"));
+}
+

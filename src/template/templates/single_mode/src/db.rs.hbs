@@ -1,0 +1,126 @@
+{{#if has_database}}
+use sqlx::{
+    postgres::PgPoolOptions,
+    sqlite::SqlitePoolOptions,
+    Pool, Postgres, Sqlite,
+};
+use std::env;
+
+{{#if has_postgresql}}
+{{#if has_sqlite}}
+/// Database connection (supports both PostgreSQL and SQLite)
+pub enum DbPool {
+    PostgreSQL(Pool<Postgres>),
+    SQLite(Pool<Sqlite>),
+}
+
+impl DbPool {
+    /// Create database pool from DATABASE_URL
+    pub async fn from_env() -> anyhow::Result<Self> {
+        let database_url = env::var("DATABASE_URL")
+            .map_err(|_| anyhow::anyhow!("DATABASE_URL environment variable not set"))?;
+
+        // Detect database type from URL scheme
+        if database_url.starts_with("postgresql://") || database_url.starts_with("postgres://") {
+            let pool = PgPoolOptions::new()
+                .max_connections(10)
+                .connect(&database_url)
+                .await?;
+            Ok(DbPool::PostgreSQL(pool))
+        } else if database_url.starts_with("sqlite://") {
+            let pool = SqlitePoolOptions::new()
+                .max_connections(10)
+                .connect(&database_url)
+                .await?;
+            Ok(DbPool::SQLite(pool))
+        } else {
+            Err(anyhow::anyhow!("Unsupported DATABASE_URL format. Must start with postgresql://, postgres://, or sqlite://"))
+        }
+    }
+
+    /// Run migrations
+    pub async fn run_migrations(&self) -> anyhow::Result<()> {
+        match self {
+            DbPool::PostgreSQL(pool) => {
+                sqlx::migrate!("./migrations").run(pool).await?;
+            }
+            DbPool::SQLite(pool) => {
+                sqlx::migrate!("./migrations").run(pool).await?;
+            }
+        }
+        Ok(())
+    }
+}
+{{/if}}
+{{/if}}
+
+{{#if has_postgresql}}
+{{#unless has_sqlite}}
+/// PostgreSQL connection pool
+pub type DbPool = Pool<Postgres>;
+
+impl DbPoolExt for DbPool {
+    /// Create PostgreSQL pool from DATABASE_URL
+    async fn from_env() -> anyhow::Result<Self> {
+        let database_url = env::var("DATABASE_URL")
+            .map_err(|_| anyhow::anyhow!("DATABASE_URL environment variable not set"))?;
+
+        let pool = PgPoolOptions::new()
+            .max_connections(10)
+            .connect(&database_url)
+            .await?;
+
+        Ok(pool)
+    }
+
+    /// Run migrations
+    async fn run_migrations(&self) -> anyhow::Result<()> {
+        sqlx::migrate!("./migrations").run(self).await?;
+        Ok(())
+    }
+}
+
+trait DbPoolExt {
+    fn from_env() -> anyhow::Result<Self>
+    where
+        Self: Sized;
+    fn run_migrations(&self) -> anyhow::Result<()>;
+}
+{{/unless}}
+{{/if}}
+
+{{#if has_sqlite}}
+{{#unless has_postgresql}}
+/// SQLite connection pool
+pub type DbPool = Pool<Sqlite>;
+
+impl DbPoolExt for DbPool {
+    /// Create SQLite pool from DATABASE_URL
+    async fn from_env() -> anyhow::Result<Self> {
+        let database_url = env::var("DATABASE_URL")
+            .map_err(|_| anyhow::anyhow!("DATABASE_URL environment variable not set"))?;
+
+        let pool = SqlitePoolOptions::new()
+            .max_connections(10)
+            .connect(&database_url)
+            .await?;
+
+        Ok(pool)
+    }
+
+    /// Run migrations
+    async fn run_migrations(&self) -> anyhow::Result<()> {
+        sqlx::migrate!("./migrations").run(self).await?;
+        Ok(())
+    }
+}
+
+trait DbPoolExt {
+    fn from_env() -> anyhow::Result<Self>
+    where
+        Self: Sized;
+    fn run_migrations(&self) -> anyhow::Result<()>;
+}
+{{/unless}}
+{{/if}}
+{{/if}}

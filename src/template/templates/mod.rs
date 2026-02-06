@@ -114,5 +114,44 @@ pub fn get_single_mode_templates() -> HashMap<&'static str, TemplateFile> {
         },
     );
 
+    // Database feature templates (conditional based on {{#if has_database}})
+    templates.insert(
+        "src/db.rs",
+        TemplateFile {
+            path: "src/db.rs",
+            content: include_str!("single_mode/src/db.rs.hbs"),
+            executable: false,
+        },
+    );
+
+    templates.insert(
+        "migrations/001_initial.sql",
+        TemplateFile {
+            path: "migrations/001_initial.sql",
+            content: include_str!("single_mode/migrations/001_initial.sql.hbs"),
+            executable: false,
+        },
+    );
+
+    // Authentication feature templates (conditional based on {{#if has_auth}})
+    templates.insert(
+        "src/handlers/auth.rs",
+        TemplateFile {
+            path: "src/handlers/auth.rs",
+            content: include_str!("single_mode/src/handlers/auth.rs.hbs"),
+            executable: false,
+        },
+    );
+
+    // Biz-error feature templates (conditional based on {{#if has_biz_error}})
+    templates.insert(
+        "biz_errors.yaml",
+        TemplateFile {
+            path: "biz_errors.yaml",
+            content: include_str!("single_mode/biz_errors.yaml.hbs"),
+            executable: false,
+        },
+    );
+
     templates
 }

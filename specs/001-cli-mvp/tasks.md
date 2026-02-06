@@ -110,11 +110,11 @@
 
 ### Prompts for User Story 2
 
-- [ ] T036 [P] [US2] Implement database selection prompt (none/postgresql/sqlite/both) in src/cli/prompts.rs
+- [X] T036 [P] [US2] Implement database selection prompt (none/postgresql/sqlite/both) in src/cli/prompts.rs
 - [ ] T037 [P] [US2] Implement database URL prompt with validation (postgresql:// or sqlite:// format) in src/cli/prompts.rs
-- [ ] T038 [P] [US2] Implement authentication confirmation prompt in src/cli/prompts.rs
-- [ ] T039 [P] [US2] Implement biz-error confirmation prompt in src/cli/prompts.rs
-- [ ] T040 [P] [US2] Implement log level selection prompt (trace/debug/info/warn/error) in src/cli/prompts.rs
+- [X] T038 [P] [US2] Implement authentication confirmation prompt in src/cli/prompts.rs
+- [X] T039 [P] [US2] Implement biz-error confirmation prompt in src/cli/prompts.rs
+- [X] T040 [P] [US2] Implement log level selection prompt (trace/debug/info/warn/error) in src/cli/prompts.rs
 
 ### Database Feature Templates
 

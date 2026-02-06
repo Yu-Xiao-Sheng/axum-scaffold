@@ -102,6 +102,28 @@ pub fn prompt_biz_error(interactive: bool) -> bool {
         .unwrap_or(false)
 }
 
+/// Prompt for log level selection
+pub fn prompt_log_level(interactive: bool) -> String {
+    if !interactive {
+        return "info".to_string();
+    }
+
+    let options = vec![
+        "trace - Very detailed diagnostic information",
+        "debug - Detailed diagnostic information",
+        "info - General informational messages (default)",
+        "warn - Warning messages",
+        "error - Error messages only",
+    ];
+
+    let ans = Select::new("Select default log level:", options)
+        .prompt()
+        .unwrap_or_else(|_| "info - General informational messages (default)");
+
+    // Extract just the level name
+    ans.split(" - ").next().unwrap_or("info").to_string()
+}
+
 /// Build complete ProjectConfig from interactive prompts
 ///
 /// This is the main entry point for collecting user input
@@ -126,15 +148,32 @@ pub fn prompt_project_config(
     let author_name = prompt_author_name(interactive);
     let description = prompt_description(interactive);
 
-    // For MVP, we use defaults for features
-    // Future enhancements will add prompts for these
-    let features = FeatureSet::default();
+    // Collect feature selections
+    let database_option = prompt_database(interactive);
+    let authentication = prompt_authentication(interactive);
+    let biz_error = prompt_biz_error(interactive);
+    let log_level = prompt_log_level(interactive);
+
+    // Build feature set
+    let features = FeatureSet {
+        database: database_option,
+        authentication,
+        logging: true, // Always enabled for now
+        biz_error,
+    };
+
+    // Build logging config with selected log level
+    let logging = Some(crate::config::LoggingConfig {
+        default_level: log_level,
+        ..Default::default()
+    });
 
     Ok(ProjectConfig {
         project_name,
         features,
         author_name,
         description,
+        logging,
         ..Default::default()
     })
 }
