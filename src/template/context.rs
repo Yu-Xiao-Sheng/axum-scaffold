@@ -17,6 +17,10 @@ pub struct TemplateContext {
     /// Project name (snake_case) for code
     pub project_name_snake: String,
 
+    /// Project name (snake_case) alias for templates
+    #[serde(rename = "project_snake_case")]
+    pub project_name_snake_alias: String,
+
     /// Project name (PascalCase) for types
     pub project_name_pascal: String,
 
@@ -203,9 +207,12 @@ impl TemplateContext {
             None
         };
 
+        let project_name_snake = to_snake_case(project_name);
+
         Self {
             project_name: project_name.clone(),
-            project_name_snake: to_snake_case(project_name),
+            project_name_snake: project_name_snake.clone(),
+            project_name_snake_alias: project_name_snake,
             project_name_pascal: to_pascal_case(project_name),
             author_name: config.author_name.clone().unwrap_or_else(|| {
                 // Try to get from git config

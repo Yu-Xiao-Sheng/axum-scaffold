@@ -192,23 +192,62 @@ pub fn ensure_dir(project_dir: &Path, relative_path: &str) -> Result<()> {
 
 /// Get success message for project generation
 pub fn get_success_message(project_dir: &Path, project_name: &str) -> String {
+    use chrono::Utc;
+
+    let generation_time = Utc::now().format("%Y-%m-%d %H:%M:%S UTC");
+
     format!(
         r#"
-✨ Project '{}' created successfully!
+✨ ══════════════════════════════════════════════════════ ✓
+✨                                                        ✨
+✨  Project '{}' created successfully!                      ✨
+✨                                                        ✨
+✨ ══════════════════════════════════════════════════════ ✓
 
-📂 Location: {}
+📂 Location:     {}
+🕐 Generated:    {}
 
-🚀 Next steps:
+═════════════════════════════════════════════════════════
+
+🚀 Quick Start:
 
   $ cd {}
   $ cargo run
 
-Then test the health endpoint:
+═════════════════════════════════════════════════════════
+
+🧪 Test your API:
+
+  # Health check
   $ curl http://127.0.0.1:8080/health
 
+  # Expected response: {{"status":"ok"}}
+
+═════════════════════════════════════════════════════════
+
+📖 Next Steps:
+
+  1. Review the generated code in src/
+  2. Customize your configuration in .env
+  3. Add new endpoints in src/handlers/
+  4. Run tests: cargo test
+  5. Build for release: cargo build --release
+
+═════════════════════════════════════════════════════════
+
+💡 Need help?
+
+  $ cd {} && cargo run --help
+  $ axum-app-create --help
+
 Happy hacking! 🦀
+
 "#,
-        project_name, project_dir.display(), project_name
+        project_name,
+        project_dir.display(),
+        generation_time,
+        project_name,
+        project_name
     )
 }
 
