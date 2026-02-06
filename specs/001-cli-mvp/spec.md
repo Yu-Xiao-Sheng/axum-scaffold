@@ -121,7 +121,6 @@ A developer building a web API needs to return consistent, structured error resp
 
 - What happens when the project name is a reserved Cargo keyword (e.g., "std", "fn")?
 - What happens when the user's home directory path contains non-ASCII characters?
-- How does the tool handle network failures when fetching template dependencies?
 - What happens if the user interrupts generation with Ctrl+C?
 - How does the tool behave when run in a directory with insufficient disk space?
 - What happens when the user provides an extremely long project name (>100 characters)?
@@ -134,9 +133,12 @@ A developer building a web API needs to return consistent, structured error resp
 
 ### Functional Requirements
 
-- **FR-001**: The tool MUST accept a project name as a command-line argument or prompt for it interactively if not provided
+- **FR-001**: The tool MUST support hybrid interaction mode:
+  - Accept all options (project name, optional features) via command-line flags for non-interactive/scripted usage
+  - Prompt interactively for any missing required values (default behavior when run without flags)
+  - Support command-line flags for: project name, database option (none/postgresql/sqlite), authentication option (yes/no), business error handling (yes/no), and logging level configuration
 - **FR-002**: The tool MUST validate project names according to Cargo naming conventions (alphanumeric, underscores, hyphens only; cannot start with a digit; cannot be a Rust keyword)
-- **FR-003**: The tool MUST generate a complete, compilable Rust project structure using Cargo
+- **FR-003**: The tool MUST generate a complete, compilable Rust project structure using Cargo with all templates embedded in the CLI binary
 - **FR-004**: The tool MUST create a single-package Cargo workspace with all source code in `src/` directory
 - **FR-005**: The tool MUST generate an Axum web server that responds to HTTP requests on localhost
 - **FR-006**: The tool MUST include structured logging with tracing instrumentation in the generated code
@@ -153,7 +155,10 @@ A developer building a web API needs to return consistent, structured error resp
 - **FR-017**: The tool MUST include example HTTP endpoints demonstrating basic Axum functionality
 - **FR-018**: The tool MUST generate proper Cargo.toml with all necessary dependencies for Axum
 - **FR-019**: The tool MUST include integration test examples in the generated project
-- **FR-020**: The tool MUST support common optional features: database support, authentication, logging level configuration
+- **FR-020**: The tool MUST support common optional features with full production-ready implementations:
+  - **Database support**: Pre-configured support for PostgreSQL (production) and SQLite (local development) with connection pooling (using deadpool or sqlx-built-in pooling), example query patterns, migration support setup using a migration tool (e.g., sqlx-cli or sea-orm migrations), and environment-based configuration switching
+  - **Authentication**: JWT-based authentication with token generation, validation middleware, login/logout endpoints, and user model examples
+  - **Logging level configuration**: Configurable logging levels (trace, debug, info, warn, error) via environment variables or configuration file, with structured logging output
 - **FR-021**: When business error handling is enabled, the tool MUST include the biz-error library as a dependency with Axum integration features
 - **FR-022**: When business error handling is enabled, the tool MUST generate a pre-configured error definition file (biz_errors.yaml) with common error codes (validation, not found, database errors) in at least two languages (English and Chinese)
 - **FR-023**: When business error handling is enabled, the tool MUST use a procedural macro to automatically generate error code enums from the YAML configuration
@@ -186,8 +191,8 @@ A developer building a web API needs to return consistent, structured error resp
 - **SC-002**: 90% of first-time users successfully generate and run their first project without requiring external documentation
 - **SC-003**: Generated projects compile without errors on the first attempt
 - **SC-004**: Generated projects pass all included tests when running "cargo test"
-- **SC-005**: Tool startup time (time to first prompt) is under 100 milliseconds
-- **SC-006**: Project generation time (after user confirms all prompts) is under 10 seconds
+- **SC-005**: Tool startup time (time to first prompt) is under 100 milliseconds when running on typical developer hardware (4-8 CPU cores, 8-16GB RAM, NVMe SSD)
+- **SC-006**: Project generation time (after user confirms all prompts) is under 10 seconds when running on typical developer hardware (4-8 CPU cores, 8-16GB RAM, NVMe SSD)
 - **SC-007**: Error messages are actionable: 80% of users can resolve common errors (invalid project name, directory exists, missing tools) without external help
 - **SC-008**: Memory usage during operation stays under 50MB RSS
 - **SC-009**: Users report satisfaction with the generated code quality (measured via post-MVP survey or GitHub feedback)
@@ -207,6 +212,18 @@ A developer building a web API needs to return consistent, structured error resp
 - When business error handling is enabled, developers are familiar with YAML configuration file format
 - When business error handling is enabled, the default error configuration includes at least English and Chinese (zh-CN) translations
 - When business error handling is enabled, error messages are primarily targeted at API consumers (developers or frontend applications)
+
+## Clarifications
+
+### Session 2025-02-05
+
+- Q: What level of support should optional features (database, authentication, logging) provide in Phase 1? → A: Full integration - Pre-configured, production-ready implementations with actual database pooling, authentication server, and configurable logging levels
+- Q: What hardware specifications should be used as the baseline for performance benchmarks? → A: Typical developer hardware - 4-8 CPU cores, 8-16GB RAM, NVMe SSD (common dev machines from 2023-2024)
+- Q: How should project templates be distributed in Phase 1? → A: Embedded templates - All project templates are embedded in the CLI binary during build (simplest, no network dependency, works offline)
+- Q: Which database technologies should be supported in Phase 1? → A: PostgreSQL + SQLite - PostgreSQL for production deployments, SQLite for local development (balances production readiness with zero-config local experience)
+- Q: Should the CLI support non-interactive mode for scripting/automation? → A: Hybrid mode - Accept command-line flags for all options, default to interactive prompts for missing values (supports both beginners and automation)
+
+---
 
 ### Out of Scope for Phase 1
 
