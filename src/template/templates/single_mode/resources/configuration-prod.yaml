@@ -1,0 +1,1 @@
+mysql_url: "mysql://****:****@127.0.0.1:3306/***?autoReconnect=true&useUnicode=true&connectTimeout=0&socketTimeout=0"

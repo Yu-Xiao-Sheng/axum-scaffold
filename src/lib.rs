@@ -1,4 +1,10 @@
-pub mod common;
-pub mod router;
-pub mod configuration;
-pub mod domain;
+// create-axum-app library
+//
+// This library contains the core functionality for the CLI tool.
+
+pub mod cli;
+pub mod config;
+pub mod error;
+pub mod generator;
+pub mod template;
+pub mod utils;
