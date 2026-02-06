@@ -4,7 +4,7 @@
 
 use crate::config::{DatabaseOption, FeatureSet, ProjectConfig};
 use crate::utils::validator::validate_project_name;
-use inquire::{Confirm, Text, Select};
+use inquire::{Confirm, Select, Text};
 
 /// Prompt for project name
 ///
@@ -118,7 +118,7 @@ pub fn prompt_log_level(interactive: bool) -> String {
 
     let ans = Select::new("Select default log level:", options)
         .prompt()
-        .unwrap_or_else(|_| "info - General informational messages (default)");
+        .unwrap_or("info - General informational messages (default)");
 
     // Extract just the level name
     ans.split(" - ").next().unwrap_or("info").to_string()

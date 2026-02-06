@@ -81,41 +81,41 @@ impl TemplateEngine {
     pub fn register_template_string(&mut self, name: &str, content: &str) -> Result<()> {
         self.handlebars
             .register_template_string(name, content)
-            .map_err(|e| CliError::Template(format!(
-                "❌ 模板注册失败 / Template registration failed\n\n\
+            .map_err(|e| {
+                CliError::Template(format!(
+                    "❌ 模板注册失败 / Template registration failed\n\n\
                  📄 模板名称 / Template name: {}\n\n\
                  💡 修复建议 / Fix: 检查模板语法 / Check template syntax\n\n\
                  📖 查看帮助 / View help: axum-app-create --help\n\n\
                  ❌ 错误详情 / Error: {}",
-                name, e
-            )))
+                    name, e
+                ))
+            })
     }
 
     /// Render a registered template by name
     pub fn render(&self, name: &str, context: &TemplateContext) -> Result<String> {
-        self.handlebars
-            .render(name, context)
-            .map_err(|e| {
-                let error_msg = e.to_string();
-                let line_info = if error_msg.contains("at line") {
-                    error_msg
-                        .split("at line")
-                        .nth(1)
-                        .and_then(|s| s.split_whitespace().next())
-                        .unwrap_or("unknown")
-                } else {
-                    "unknown"
-                };
+        self.handlebars.render(name, context).map_err(|e| {
+            let error_msg = e.to_string();
+            let line_info = if error_msg.contains("at line") {
+                error_msg
+                    .split("at line")
+                    .nth(1)
+                    .and_then(|s| s.split_whitespace().next())
+                    .unwrap_or("unknown")
+            } else {
+                "unknown"
+            };
 
-                CliError::Template(format!(
-                    "❌ 模板渲染失败 / Template rendering failed\n\n\
+            CliError::Template(format!(
+                "❌ 模板渲染失败 / Template rendering failed\n\n\
                      📄 模板名称 / Template name: {}\n\
                      📍 位置 / Line: {}\n\n\
                      📖 查看帮助 / View help: axum-app-create --help\n\n\
                      ❌ 错误详情 / Error: {}",
-                    name, line_info, error_msg
-                ))
-            })
+                name, line_info, error_msg
+            ))
+        })
     }
 }
 
@@ -140,9 +140,9 @@ fn register_custom_helpers(handlebars: &mut Handlebars) {
              _rc: &mut handlebars::RenderContext<'_, '_>,
              out: &mut dyn Output|
              -> handlebars::HelperResult {
-                let param = h
-                    .param(0)
-                    .ok_or_else(|| RenderErrorReason::Other("Missing parameter for to_snake_case".into()))?;
+                let param = h.param(0).ok_or_else(|| {
+                    RenderErrorReason::Other("Missing parameter for to_snake_case".into())
+                })?;
                 let value = param
                     .value()
                     .as_str()
@@ -165,9 +165,9 @@ fn register_custom_helpers(handlebars: &mut Handlebars) {
              _rc: &mut handlebars::RenderContext<'_, '_>,
              out: &mut dyn Output|
              -> handlebars::HelperResult {
-                let param = h
-                    .param(0)
-                    .ok_or_else(|| RenderErrorReason::Other("Missing parameter for to_pascal_case".into()))?;
+                let param = h.param(0).ok_or_else(|| {
+                    RenderErrorReason::Other("Missing parameter for to_pascal_case".into())
+                })?;
                 let value = param
                     .value()
                     .as_str()
@@ -190,9 +190,9 @@ fn register_custom_helpers(handlebars: &mut Handlebars) {
              out: &mut dyn Output|
              -> handlebars::HelperResult {
                 // Reuse to_pascal_case implementation
-                let param = h
-                    .param(0)
-                    .ok_or_else(|| RenderErrorReason::Other("Missing parameter for to_upper_camel_case".into()))?;
+                let param = h.param(0).ok_or_else(|| {
+                    RenderErrorReason::Other("Missing parameter for to_upper_camel_case".into())
+                })?;
                 let value = param
                     .value()
                     .as_str()
@@ -217,9 +217,7 @@ fn to_pascal_case(name: &str) -> String {
             let mut chars = word.chars();
             match chars.next() {
                 None => String::new(),
-                Some(first) => {
-                    first.to_uppercase().collect::<String>() + chars.as_str()
-                }
+                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
             }
         })
         .collect()

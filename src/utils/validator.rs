@@ -6,13 +6,11 @@ use std::collections::HashSet;
 
 /// Reserved Cargo keywords that cannot be used as project names
 const RESERVED_KEYWORDS: &[&str] = &[
-    "abstract", "alignof", "as", "become", "box", "break", "const",
-    "continue", "crate", "do", "else", "enum", "extern", "false", "final",
-    "fn", "for", "if", "impl", "in", "let", "loop", "macro", "match",
-    "mod", "move", "mut", "offsetof", "override", "priv", "proc", "pub",
-    "pure", "ref", "return", "self", "Self", "sizeof", "static", "struct",
-    "super", "trait", "true", "type", "typeof", "unsafe", "unsized", "use",
-    "virtual", "where", "while", "yield",
+    "abstract", "alignof", "as", "become", "box", "break", "const", "continue", "crate", "do",
+    "else", "enum", "extern", "false", "final", "fn", "for", "if", "impl", "in", "let", "loop",
+    "macro", "match", "mod", "move", "mut", "offsetof", "override", "priv", "proc", "pub", "pure",
+    "ref", "return", "self", "Self", "sizeof", "static", "struct", "super", "trait", "true",
+    "type", "typeof", "unsafe", "unsized", "use", "virtual", "where", "while", "yield",
 ];
 
 /// Validate project name according to Cargo naming conventions
@@ -44,12 +42,11 @@ const RESERVED_KEYWORDS: &[&str] = &[
 pub fn validate_project_name(name: &str) -> Result<(), String> {
     // Check if empty
     if name.is_empty() {
-        return Err(
-            "❌ 项目名称不能为空 / Project name cannot be empty\n\n\
+        return Err("❌ 项目名称不能为空 / Project name cannot be empty\n\n\
              💡 修复建议 / Fix: 提供一个有效的项目名称 / Provide a valid project name\n\
              ✅ 好的示例 / Good examples: my-app, my_app, awesome-project\n\n\
-             📖 查看帮助 / View help: axum-app-create --help".to_string()
-        );
+             📖 查看帮助 / View help: axum-app-create --help"
+            .to_string());
     }
 
     // Check length (practical limit)
@@ -67,12 +64,18 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
     }
 
     // Check if starts with digit
-    if name.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+    if name
+        .chars()
+        .next()
+        .map(|c| c.is_ascii_digit())
+        .unwrap_or(false)
+    {
         return Err(
             "❌ 项目名称不能以数字开头 / Project name cannot start with a digit\n\n\
              💡 修复建议 / Fix: 在数字前添加字母 / Add letters before the digit\n\
              ✅ 好的示例 / Good example: project123 → project123\n\n\
-             📖 查看帮助 / View help: axum-app-create --help".to_string()
+             📖 查看帮助 / View help: axum-app-create --help"
+                .to_string(),
         );
     }
 
@@ -86,14 +89,19 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
               - '{}' → 'my_{}' 或 / or 'my-{}-cli'\n\
               - '{}' → 'setup_{}' 或 / or '{}-tool'\n\n\
              📖 查看帮助 / View help: axum-app-create --help",
-            name,              // The keyword itself
-            name, name, name,   // First example: {name} → my_{name} or my-{name}-cli
-            name, name, name    // Second example: {name} → setup_{name} or {name}-tool
+            name, // The keyword itself
+            name,
+            name,
+            name, // First example: {name} → my_{name} or my-{name}-cli
+            name,
+            name,
+            name // Second example: {name} → setup_{name} or {name}-tool
         ));
     }
 
     // Check characters (alphanumeric, hyphens, underscores only)
-    let invalid_chars: Vec<char> = name.chars()
+    let invalid_chars: Vec<char> = name
+        .chars()
         .filter(|c| !(c.is_alphanumeric() || *c == '-' || *c == '_'))
         .collect();
 
@@ -108,8 +116,7 @@ pub fn validate_project_name(name: &str) -> Result<(), String> {
               - 'my@project' → 'my_project'\n\
               - 'my.project' → 'my_project'\n\n\
              📖 查看帮助 / View help: axum-app-create --help",
-            invalid_str,
-            invalid_str
+            invalid_str, invalid_str
         ));
     }
 

@@ -19,7 +19,11 @@ fn test_generate_basic_project() {
     };
 
     let result = generate_project(&project_dir, &config, false);
-    assert!(result.is_ok(), "Project generation failed: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Project generation failed: {:?}",
+        result.err()
+    );
 
     // Verify project directory exists
     assert!(project_dir.exists(), "Project directory was not created");
@@ -61,7 +65,11 @@ fn test_generated_project_compiles() {
 
     // Generate project
     let result = generate_project(&project_dir, &config, false);
-    assert!(result.is_ok(), "Project generation failed: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Project generation failed: {:?}",
+        result.err()
+    );
 
     // Run cargo check
     let output = Command::new("cargo")
@@ -72,8 +80,14 @@ fn test_generated_project_compiles() {
         .expect("Failed to run cargo check");
 
     if !output.status.success() {
-        eprintln!("cargo check stdout: {}", String::from_utf8_lossy(&output.stdout));
-        eprintln!("cargo check stderr: {}", String::from_utf8_lossy(&output.stderr));
+        eprintln!(
+            "cargo check stdout: {}",
+            String::from_utf8_lossy(&output.stdout)
+        );
+        eprintln!(
+            "cargo check stderr: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
     }
 
     assert!(
@@ -105,7 +119,11 @@ fn test_health_endpoint_exists() {
 
     // Generate project
     let result = generate_project(&project_dir, &config, false);
-    assert!(result.is_ok(), "Project generation failed: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Project generation failed: {:?}",
+        result.err()
+    );
 
     // Verify health.rs exists and contains correct endpoint
     let health_rs = project_dir.join("src/handlers/health.rs");
@@ -300,4 +318,3 @@ fn test_multiple_features() {
     assert!(env_example.contains("JWT_SECRET"));
     assert!(env_example.contains("LOG_LEVEL"));
 }
-

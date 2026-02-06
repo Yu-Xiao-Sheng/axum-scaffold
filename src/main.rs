@@ -2,11 +2,11 @@
 //
 // This tool generates new Axum projects with sensible defaults and optional features.
 
-use clap::Parser;
 use axum_app_create::cli::{is_non_interactive, prompts::prompt_project_config};
 use axum_app_create::error::CliError;
 use axum_app_create::generator::project::{generate_project, get_success_message};
 use axum_app_create::utils::rust_toolchain::check_rust_toolchain;
+use clap::Parser;
 use std::path::PathBuf;
 
 /// Simple CLI tool to scaffold Axum web applications

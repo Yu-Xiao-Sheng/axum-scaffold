@@ -5,9 +5,10 @@
 use serde::{Deserialize, Serialize};
 
 /// Database option selection
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum DatabaseOption {
     /// No database support
+    #[default]
     None,
     /// PostgreSQL only (production-focused)
     PostgreSQL,
@@ -56,12 +57,6 @@ pub struct FeatureSet {
     pub logging: bool,
     /// Business error handling integration
     pub biz_error: bool,
-}
-
-impl Default for DatabaseOption {
-    fn default() -> Self {
-        Self::None
-    }
 }
 
 /// Database configuration

@@ -28,7 +28,7 @@ pub fn init_git_repo(project_dir: &Path) -> Result<()> {
             return Err(CliError::Git(format!(
                 "Failed to initialize git repository: {}",
                 e
-            )))
+            )));
         }
     };
 
@@ -40,12 +40,7 @@ pub fn init_git_repo(project_dir: &Path) -> Result<()> {
     // Add all files to index
     let mut index = match repo.index() {
         Ok(i) => i,
-        Err(e) => {
-            return Err(CliError::Git(format!(
-                "Failed to get git index: {}",
-                e
-            )))
-        }
+        Err(e) => return Err(CliError::Git(format!("Failed to get git index: {}", e))),
     };
 
     match index.add_all(["*"], git2::IndexAddOption::DEFAULT, None) {
@@ -54,36 +49,23 @@ pub fn init_git_repo(project_dir: &Path) -> Result<()> {
             return Err(CliError::Git(format!(
                 "Failed to add files to git index: {}",
                 e
-            )))
+            )));
         }
     }
 
     if let Err(e) = index.write() {
-        return Err(CliError::Git(format!(
-            "Failed to write git index: {}",
-            e
-        )));
+        return Err(CliError::Git(format!("Failed to write git index: {}", e)));
     }
 
     // Create initial commit
     let tree_id = match index.write_tree() {
         Ok(id) => id,
-        Err(e) => {
-            return Err(CliError::Git(format!(
-                "Failed to write git tree: {}",
-                e
-            )))
-        }
+        Err(e) => return Err(CliError::Git(format!("Failed to write git tree: {}", e))),
     };
 
     let tree = match repo.find_tree(tree_id) {
         Ok(t) => t,
-        Err(e) => {
-            return Err(CliError::Git(format!(
-                "Failed to find git tree: {}",
-                e
-            )))
-        }
+        Err(e) => return Err(CliError::Git(format!("Failed to find git tree: {}", e))),
     };
 
     // Create signature for commit
@@ -93,7 +75,7 @@ pub fn init_git_repo(project_dir: &Path) -> Result<()> {
             return Err(CliError::Git(format!(
                 "Failed to create git signature: {}",
                 e
-            )))
+            )));
         }
     };
 
@@ -111,7 +93,7 @@ pub fn init_git_repo(project_dir: &Path) -> Result<()> {
             return Err(CliError::Git(format!(
                 "Failed to create initial commit: {}",
                 e
-            )))
+            )));
         }
     };
 
@@ -168,7 +150,11 @@ mod tests {
         let result = init_git_repo(&project_dir);
 
         // Check if it succeeded
-        assert!(result.is_ok(), "Git initialization failed: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Git initialization failed: {:?}",
+            result.err()
+        );
 
         // Verify .gitignore was created
         assert!(project_dir.join(".gitignore").exists());

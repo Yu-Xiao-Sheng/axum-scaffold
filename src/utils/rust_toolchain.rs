@@ -33,19 +33,19 @@ pub fn check_rust_toolchain() -> Result<()> {
     let rustc_version = check_command("rustc", &["--version"])?;
 
     // Parse version to ensure it meets minimum requirements
-    if let Some(version_str) = rustc_version.split_whitespace().nth(1) {
-        if !version_meets_minimum(version_str, MIN_RUST_VERSION) {
-            return Err(CliError::ToolchainError(format!(
-                "❌ Rust 版本过低 / Rust version too old\n\n\
-                 当前版本 / Current version: {}\n\
-                 最低要求 / Minimum required: {}\n\n\
-                 💡 修复建议 / Fix: 更新Rust工具链 / Update Rust toolchain\n\
-                 💻 更新命令 / Update command: rustup update\n\
-                 📖 文档链接 / Documentation: https://rust-lang.github.io/rustup/\n\
-                 📖 查看帮助 / View help: axum-app-create --help",
-                version_str, MIN_RUST_VERSION
-            )));
-        }
+    if let Some(version_str) = rustc_version.split_whitespace().nth(1)
+        && !version_meets_minimum(version_str, MIN_RUST_VERSION)
+    {
+        return Err(CliError::ToolchainError(format!(
+            "❌ Rust 版本过低 / Rust version too old\n\n\
+             当前版本 / Current version: {}\n\
+             最低要求 / Minimum required: {}\n\n\
+             💡 修复建议 / Fix: 更新Rust工具链 / Update Rust toolchain\n\
+             💻 更新命令 / Update command: rustup update\n\
+             📖 文档链接 / Documentation: https://rust-lang.github.io/rustup/\n\
+             📖 查看帮助 / View help: axum-app-create --help",
+            version_str, MIN_RUST_VERSION
+        )));
     }
 
     // Check cargo
@@ -79,18 +79,16 @@ fn check_command(command: &str, args: &[&str]) -> Result<String> {
                 )))
             }
         }
-        Err(e) => {
-            Err(CliError::ToolchainError(format!(
-                "❌ 未找到 {} / {} not found\n\n\
+        Err(e) => Err(CliError::ToolchainError(format!(
+            "❌ 未找到 {} / {} not found\n\n\
                  💡 修复建议 / Fix: 安装Rust工具链 / Install Rust toolchain\n\
                  📦 安装链接 / Installation link: https://rustup.rs/\n\
                  💻 安装命令 / Installation command:\n\
                     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh\n\n\
                  📖 查看帮助 / View help: axum-app-create --help\n\n\
                  ❌ 错误详情 / Error details: {}",
-                command, command, e
-            )))
-        }
+            command, command, e
+        ))),
     }
 }
 
@@ -104,11 +102,8 @@ fn check_command(command: &str, args: &[&str]) -> Result<String> {
 /// * `true` if current >= minimum
 /// * `false` if current < minimum
 fn version_meets_minimum(current: &str, minimum: &str) -> bool {
-    let parse_version = |v: &str| -> Vec<u32> {
-        v.split('.')
-            .map(|part| part.parse().unwrap_or(0))
-            .collect()
-    };
+    let parse_version =
+        |v: &str| -> Vec<u32> { v.split('.').map(|part| part.parse().unwrap_or(0)).collect() };
 
     let current_parts = parse_version(current);
     let minimum_parts = parse_version(minimum);

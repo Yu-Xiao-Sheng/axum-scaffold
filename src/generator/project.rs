@@ -24,7 +24,11 @@ use std::path::Path;
 /// # Returns
 /// * `Ok(())` if generation succeeded
 /// * `Err(CliError)` if generation failed
-pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive: bool) -> Result<()> {
+pub fn generate_project(
+    project_dir: &Path,
+    config: &ProjectConfig,
+    interactive: bool,
+) -> Result<()> {
     // Validate project directory doesn't exist
     if project_dir.exists() {
         // In non-interactive mode, fail immediately
@@ -42,7 +46,10 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive:
         }
 
         // In interactive mode, prompt for action
-        println!("\n⚠️  警告 / Warning: 目录已存在 / Directory already exists: '{}'", project_dir.display());
+        println!(
+            "\n⚠️  警告 / Warning: 目录已存在 / Directory already exists: '{}'",
+            project_dir.display()
+        );
         println!("📁 位置 / Location: {}", project_dir.display());
         println!();
 
@@ -53,8 +60,7 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive:
             "重命名 / Rename - Keep existing directory, use different name",
         ];
 
-        let ans = inquire::Select::new("请选择操作 / Choose an action:", options)
-            .prompt()?;
+        let ans = inquire::Select::new("请选择操作 / Choose an action:", options).prompt()?;
 
         match ans {
             "覆盖 / Overwrite - Delete existing directory and regenerate" => {
@@ -64,19 +70,30 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive:
             }
             "取消 / Cancel - Abort project generation" => {
                 println!("❌ 已取消 / Aborted");
-                return Err(CliError::Generation("项目生成已取消 / Project generation cancelled by user".to_string()));
+                return Err(CliError::Generation(
+                    "项目生成已取消 / Project generation cancelled by user".to_string(),
+                ));
             }
             "重命名 / Rename - Keep existing directory, use different name" => {
-                println!("❌ 请使用不同的项目名称重新运行 / Please run again with a different project name");
-                return Err(CliError::Generation("请使用不同的项目名称 / Please use a different project name".to_string()));
+                println!(
+                    "❌ 请使用不同的项目名称重新运行 / Please run again with a different project name"
+                );
+                return Err(CliError::Generation(
+                    "请使用不同的项目名称 / Please use a different project name".to_string(),
+                ));
             }
             _ => {
-                return Err(CliError::Generation("无效选择 / Invalid choice".to_string()));
+                return Err(CliError::Generation(
+                    "无效选择 / Invalid choice".to_string(),
+                ));
             }
         }
     }
 
-    println!("\n🚀 正在创建项目 / Creating project: {}", config.project_name);
+    println!(
+        "\n🚀 正在创建项目 / Creating project: {}",
+        config.project_name
+    );
     println!("📁 位置 / Location: {}", project_dir.display());
 
     // Create project directory
@@ -136,9 +153,11 @@ fn handle_permission_error(error: std::io::Error, path: &Path) -> Result<()> {
                  📖 查看帮助 / View help: axum-app-create --help\n\n\
                  ❌ 错误详情 / Error: {}",
                 path.display(),
-                path.parent().map(|p| p.display().to_string()).unwrap_or_else(|| ".".to_string()),
+                path.parent()
+                    .map(|p| p.display().to_string())
+                    .unwrap_or_else(|| ".".to_string()),
                 error
-            )
+            ),
         )))
     } else {
         Err(CliError::Io(error))
@@ -159,10 +178,10 @@ pub fn write_file(project_dir: &Path, relative_path: &str, content: &str) -> Res
     let file_path = project_dir.join(relative_path);
 
     // Create parent directories if needed
-    if let Some(parent) = file_path.parent() {
-        if let Err(e) = std::fs::create_dir_all(parent) {
-            return handle_permission_error(e, &file_path);
-        }
+    if let Some(parent) = file_path.parent()
+        && let Err(e) = std::fs::create_dir_all(parent)
+    {
+        return handle_permission_error(e, &file_path);
     }
 
     // Write file

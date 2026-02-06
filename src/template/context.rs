@@ -244,9 +244,7 @@ fn to_pascal_case(name: &str) -> String {
             let mut chars = word.chars();
             match chars.next() {
                 None => String::new(),
-                Some(first) => {
-                    first.to_uppercase().collect::<String>() + chars.as_str()
-                }
+                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
             }
         })
         .collect()
@@ -262,11 +260,7 @@ fn get_git_user_name() -> Option<String> {
         .ok()
         .and_then(|output| {
             let name = String::from_utf8_lossy(&output.stdout).trim().to_string();
-            if name.is_empty() {
-                None
-            } else {
-                Some(name)
-            }
+            if name.is_empty() { None } else { Some(name) }
         })
 }
 
@@ -275,15 +269,15 @@ fn get_current_year() -> String {
     use std::process::Command;
 
     // Try date command first (more reliable on Linux/macOS)
-    if let Ok(output) = Command::new("date").arg("+%Y").output() {
-        if output.status.success() {
-            if let Some(year) = String::from_utf8_lossy(&output.stdout).trim().chars().next() {
-                // Check if it looks like a year (starts with 2 or 20)
-                if year == '2' {
-                    return String::from_utf8_lossy(&output.stdout).trim().to_string();
-                }
-            }
-        }
+    if let Ok(output) = Command::new("date").arg("+%Y").output()
+        && output.status.success()
+        && let Some(year) = String::from_utf8_lossy(&output.stdout)
+            .trim()
+            .chars()
+            .next()
+        && year == '2'
+    {
+        return String::from_utf8_lossy(&output.stdout).trim().to_string();
     }
 
     // Fallback to chrono (which we use in the CLI)
