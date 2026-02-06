@@ -42,7 +42,34 @@ impl TemplateEngine {
     ) -> Result<String> {
         self.handlebars
             .render_template(template_content, context)
-            .map_err(|e| CliError::Template(format!("{}: {}", template_name, e)))
+            .map_err(|e| {
+                // Extract line/column information from the error if available
+                let error_msg = e.to_string();
+
+                // Try to extract line number from handlebars error
+                let line_info = if error_msg.contains("at line") {
+                    error_msg
+                        .split("at line")
+                        .nth(1)
+                        .and_then(|s| s.split_whitespace().next())
+                        .unwrap_or("unknown")
+                } else {
+                    "unknown"
+                };
+
+                CliError::Template(format!(
+                    "❌ 模板渲染失败 / Template rendering failed\n\n\
+                     📄 模板名称 / Template name: {}\n\
+                     📍 位置 / Line: {}\n\n\
+                     💡 修复建议 / Fix:\n\
+                     1. 检查模板语法是否正确 / Check template syntax\n\
+                     2. 确认所有变量都在上下文中定义 / Ensure all variables are defined in context\n\
+                     3. 查看完整错误信息 / See full error message below\n\n\
+                     ❌ 错误详情 / Error details:\n\
+                     {}",
+                    template_name, line_info, error_msg
+                ))
+            })
     }
 
     /// Register a template string from memory
@@ -53,14 +80,39 @@ impl TemplateEngine {
     pub fn register_template_string(&mut self, name: &str, content: &str) -> Result<()> {
         self.handlebars
             .register_template_string(name, content)
-            .map_err(|e| CliError::Template(format!("Failed to register template '{}': {}", name, e)))
+            .map_err(|e| CliError::Template(format!(
+                "❌ 模板注册失败 / Template registration failed\n\n\
+                 📄 模板名称 / Template name: {}\n\n\
+                 💡 修复建议 / Fix: 检查模板语法 / Check template syntax\n\n\
+                 ❌ 错误详情 / Error: {}",
+                name, e
+            )))
     }
 
     /// Render a registered template by name
     pub fn render(&self, name: &str, context: &TemplateContext) -> Result<String> {
         self.handlebars
             .render(name, context)
-            .map_err(|e| CliError::Template(format!("Failed to render template '{}': {}", name, e)))
+            .map_err(|e| {
+                let error_msg = e.to_string();
+                let line_info = if error_msg.contains("at line") {
+                    error_msg
+                        .split("at line")
+                        .nth(1)
+                        .and_then(|s| s.split_whitespace().next())
+                        .unwrap_or("unknown")
+                } else {
+                    "unknown"
+                };
+
+                CliError::Template(format!(
+                    "❌ 模板渲染失败 / Template rendering failed\n\n\
+                     📄 模板名称 / Template name: {}\n\
+                     📍 位置 / Line: {}\n\n\
+                     ❌ 错误详情 / Error: {}",
+                    name, line_info, error_msg
+                ))
+            })
     }
 }
 
