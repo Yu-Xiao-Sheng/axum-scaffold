@@ -36,8 +36,12 @@ pub fn check_rust_toolchain() -> Result<()> {
     if let Some(version_str) = rustc_version.split_whitespace().nth(1) {
         if !version_meets_minimum(version_str, MIN_RUST_VERSION) {
             return Err(CliError::ToolchainError(format!(
-                "Rust version {} is below minimum required version {}\n\
-                 Please update Rust by running: rustup update",
+                "❌ Rust 版本过低 / Rust version too old\n\n\
+                 当前版本 / Current version: {}\n\
+                 最低要求 / Minimum required: {}\n\n\
+                 💡 修复建议 / Fix: 更新Rust工具链 / Update Rust toolchain\n\
+                 💻 更新命令 / Update command: rustup update\n\
+                 📖 文档链接 / Documentation: https://rust-lang.github.io/rustup/",
                 version_str, MIN_RUST_VERSION
             )));
         }
@@ -65,16 +69,23 @@ fn check_command(command: &str, args: &[&str]) -> Result<String> {
                 Ok(String::from_utf8_lossy(&output.stdout).to_string())
             } else {
                 Err(CliError::ToolchainError(format!(
-                    "{} command failed with non-zero exit code",
-                    command
+                    "❌ {} 命令执行失败 / command failed with non-zero exit code\n\n\
+                     💡 修复建议 / Fix: 检查Rust工具链是否正确安装 / Check if Rust toolchain is properly installed\n\
+                     📦 安装指南 / Installation guide: https://rustup.rs/\n\
+                     🔧 验证安装 / Verify installation: {} --version",
+                    command, command
                 )))
             }
         }
         Err(e) => {
             Err(CliError::ToolchainError(format!(
-                "{} not found. Please install Rust from https://rustup.rs/\n\n\
-                 Error details: {}",
-                command, e
+                "❌ 未找到 {} / {} not found\n\n\
+                 💡 修复建议 / Fix: 安装Rust工具链 / Install Rust toolchain\n\
+                 📦 安装链接 / Installation link: https://rustup.rs/\n\
+                 💻 安装命令 / Installation command:\n\
+                    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh\n\n\
+                 ❌ 错误详情 / Error details: {}",
+                command, command, e
             )))
         }
     }
