@@ -79,7 +79,9 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive:
     println!("📁 位置 / Location: {}", project_dir.display());
 
     // Create project directory
-    std::fs::create_dir_all(project_dir)?;
+    if let Err(e) = std::fs::create_dir_all(project_dir) {
+        return handle_permission_error(e, project_dir);
+    }
 
     // Create template context
     let ctx = TemplateContext::from_config(config);
@@ -110,6 +112,37 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig, interactive:
     Ok(())
 }
 
+/// Handle permission errors with helpful suggestions
+///
+/// # Arguments
+/// * `error` - The IO error that occurred
+/// * `path` - The path where the error occurred
+///
+/// # Returns
+/// * `Err(CliError)` with helpful permission error message
+fn handle_permission_error(error: std::io::Error, path: &Path) -> Result<()> {
+    if error.kind() == std::io::ErrorKind::PermissionDenied {
+        Err(CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::PermissionDenied,
+            format!(
+                "❌ 权限拒绝 / Permission denied: 无法访问目录 / cannot access directory: '{}'\n\n\
+                 💡 修复建议 / Fix:\n\
+                 1. 使用 --force 标志 / Use --force flag\n\
+                 2. 切换到用户目录 / Switch to user directory: cd ~\n\
+                 3. 使用临时目录 / Use temp directory: /tmp/my-project\n\
+                 4. 检查目录权限 / Check directory permissions: ls -la {}\n\
+                 5. 使用sudo（不推荐）/ Use sudo (not recommended): sudo axum-app-create\n\n\
+                 ❌ 错误详情 / Error: {}",
+                path.display(),
+                path.parent().map(|p| p.display().to_string()).unwrap_or_else(|| ".".to_string()),
+                error
+            )
+        )))
+    } else {
+        Err(CliError::Io(error))
+    }
+}
+
 /// Write a file to the project directory
 ///
 /// # Arguments
@@ -125,11 +158,15 @@ pub fn write_file(project_dir: &Path, relative_path: &str, content: &str) -> Res
 
     // Create parent directories if needed
     if let Some(parent) = file_path.parent() {
-        std::fs::create_dir_all(parent)?;
+        if let Err(e) = std::fs::create_dir_all(parent) {
+            return handle_permission_error(e, &file_path);
+        }
     }
 
     // Write file
-    std::fs::write(&file_path, content)?;
+    if let Err(e) = std::fs::write(&file_path, content) {
+        return handle_permission_error(e, &file_path);
+    }
 
     Ok(())
 }
@@ -145,7 +182,9 @@ pub fn write_file(project_dir: &Path, relative_path: &str, content: &str) -> Res
 /// * `Err(CliError)` if directory creation failed
 pub fn ensure_dir(project_dir: &Path, relative_path: &str) -> Result<()> {
     let dir_path = project_dir.join(relative_path);
-    std::fs::create_dir_all(dir_path)?;
+    if let Err(e) = std::fs::create_dir_all(&dir_path) {
+        return handle_permission_error(e, &dir_path);
+    }
     Ok(())
 }
 
