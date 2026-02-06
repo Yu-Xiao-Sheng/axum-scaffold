@@ -119,6 +119,24 @@ Once released, the tool MUST maintain backward compatibility or provide clear mi
 
 **Rationale**: Developers upgrade tools infrequently. Breaking changes waste time and erode trust. Stability enables adoption in teams and enterprises.
 
+### VII. Communication Language Standard (用户沟通语言标准)
+
+所有与用户的需求分析、报告、计划和文档输出必须使用中文。
+
+**Language Requirements**:
+- **Requirements Analysis**: All feature specifications, user stories, and requirements MUST be documented in Chinese
+- **Progress Reports**: All status updates, progress reports, and completion summaries MUST be in Chinese
+- **Documentation**: User-facing documentation, README files, and guides MUST be in Chinese (with English translations optional)
+- **Error Messages**: Error messages shown to users SHOULD be in Chinese or bilingual
+- **Code Comments**: Generated code comments MAY use Chinese for clarity when appropriate
+
+**Exceptions**:
+- Technical terms without established Chinese translations MAY use English (e.g., "crate", "macro", "trait")
+- API references and official documentation links MAY remain in original language
+- Internal technical documentation between developers MAY use English
+
+**Rationale**: 本项目主要服务中文用户社区。使用中文进行需求分析和报告可以确保准确传达意图，减少理解偏差，提高协作效率。英语保留用于技术术语和国际化的场景。
+
 ## Testing Requirements
 
 ### Test Coverage
@@ -184,4 +202,4 @@ Non-trivial features (e.g., new CLI modes, template engines) MUST follow TDD:
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2025-02-05 | **Last Amended**: 2025-02-05
+**Version**: 1.1.0 | **Ratified**: 2025-02-05 | **Last Amended**: 2026-02-06
