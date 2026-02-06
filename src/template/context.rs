@@ -2,7 +2,7 @@
 //
 // This module builds context data for template rendering.
 
-use crate::config::ProjectConfig;
+use crate::config::{DatabaseConfig, DatabaseOption, FeatureSet, ProjectConfig};
 use serde::Serialize;
 
 /// Template context data structure

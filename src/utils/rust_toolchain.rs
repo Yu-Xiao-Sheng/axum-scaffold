@@ -21,7 +21,7 @@ const MIN_RUST_VERSION: &str = "1.75.0";
 ///
 /// # Examples
 /// ```
-/// use create_axum::utils::rust_toolchain::check_rust_toolchain;
+/// use create_axum_app::utils::rust_toolchain::check_rust_toolchain;
 ///
 /// match check_rust_toolchain() {
 ///     Ok(()) => println!("Rust toolchain is ready"),

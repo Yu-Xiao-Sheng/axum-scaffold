@@ -39,7 +39,7 @@ const RESERVED_KEYWORDS: &[&str] = &[
 /// assert!(validate_project_name("my-app").is_ok());
 /// assert!(validate_project_name("my_app").is_ok());
 /// assert!(validate_project_name("123invalid").is_err());
-/// assert!(validate_project_name("std").is_err()); // Reserved keyword
+/// assert!(validate_project_name("fn").is_err()); // Reserved keyword
 /// ```
 pub fn validate_project_name(name: &str) -> Result<(), String> {
     // Check if empty
@@ -121,7 +121,9 @@ mod tests {
         assert!(validate_project_name("fn").is_err());
         assert!(validate_project_name("struct").is_err());
         assert!(validate_project_name("impl").is_err());
-        assert!(validate_project_name("std").is_err());
+        assert!(validate_project_name("match").is_err());
+        assert!(validate_project_name("if").is_err());
+        assert!(validate_project_name("else").is_err());
     }
 
     #[test]
