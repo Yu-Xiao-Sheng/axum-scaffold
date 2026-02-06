@@ -1,4 +1,4 @@
-# Data Model: create-axum-app CLI Tool - Phase 1 MVP
+# Data Model: axum-app-create CLI Tool - Phase 1 MVP
 
 **Date**: 2025-02-05
 **Purpose**: Define data structures and entities for the CLI tool and generated projects
@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document defines the data model for the create-axum-app CLI tool. Since this is a code generation tool rather than a data-driven application, the "data model" primarily consists of configuration structures, template contexts, and the schemas for generated projects when optional features are enabled.
+This document defines the data model for the axum-app-create CLI tool. Since this is a code generation tool rather than a data-driven application, the "data model" primarily consists of configuration structures, template contexts, and the schemas for generated projects when optional features are enabled.
 
 ## 1. CLI Tool Data Structures
 
@@ -811,7 +811,7 @@ pub const TEMPLATES: &[TemplateFile] = &[
 
 ## Summary
 
-The data model for create-axum-app consists of:
+The data model for axum-app-create consists of:
 
 1. **CLI Tool Configuration**: `ProjectConfig`, `FeatureSet`, and feature-specific configs
 2. **Template Context**: `TemplateContext` for variable substitution in templates

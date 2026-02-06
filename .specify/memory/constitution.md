@@ -7,7 +7,7 @@ Sync Impact Report:
 - Follow-up TODOs: None
 -->
 
-# create-axum-app Constitution
+# axum-app-create Constitution
 
 ## Core Principles
 
@@ -80,7 +80,7 @@ The tool architecture MUST support user customization without forking:
 
 - **Custom templates**: Users can provide local or remote template repositories
 - **Template hooks**: `pre-generate`, `post-generate`, `pre-build`, `post-build` hooks for custom logic
-- **Plugin API**: Well-defined interface for third-party extensions (e.g., `create-axum-app-auth`, `create-axum-app-graphql`)
+- **Plugin API**: Well-defined interface for third-party extensions (e.g., `axum-app-create-auth`, `axum-app-create-graphql`)
 - **Template marketplace**: Community-contributed templates with discovery and rating
 
 **Constraints**: Core tool behavior cannot be overridden by plugins (security guardrails). Plugins run in subprocess isolation.

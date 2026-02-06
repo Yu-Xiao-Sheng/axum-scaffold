@@ -1,4 +1,4 @@
-// create-axum-app library
+// axum-app-create library
 //
 // This library contains the core functionality for the CLI tool.
 

@@ -2,8 +2,8 @@
 //
 // These tests verify the end-to-end functionality of the CLI tool
 
-use create_axum_app::config::ProjectConfig;
-use create_axum_app::generator::project::generate_project;
+use axum_app_create::config::ProjectConfig;
+use axum_app_create::generator::project::generate_project;
 use std::process::Command;
 use tempfile::TempDir;
 

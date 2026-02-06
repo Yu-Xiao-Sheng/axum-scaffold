@@ -1,4 +1,4 @@
-# Specification Quality Checklist: create-axum-app CLI Tool - Phase 1 MVP
+# Specification Quality Checklist: axum-app-create CLI Tool - Phase 1 MVP
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2025-02-05

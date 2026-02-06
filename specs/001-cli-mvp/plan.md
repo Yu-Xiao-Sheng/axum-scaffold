@@ -1,4 +1,4 @@
-# Implementation Plan: create-axum-app CLI Tool - Phase 1 MVP
+# Implementation Plan: axum-app-create CLI Tool - Phase 1 MVP
 
 **Branch**: `001-cli-mvp` | **Date**: 2025-02-05 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/001-cli-mvp/spec.md`
@@ -64,7 +64,7 @@ specs/001-cli-mvp/
 
 ```text
 # CLI Tool Structure
-create-axum-app/
+axum-app-create/
 ├── src/
 │   ├── main.rs              # CLI entry point
 │   ├── cli/

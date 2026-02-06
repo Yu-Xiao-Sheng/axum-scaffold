@@ -298,7 +298,7 @@ mod tests {
     #[test]
     fn test_to_pascal_case() {
         assert_eq!(to_pascal_case("my-app"), "MyApp");
-        assert_eq!(to_pascal_case("create-axum-app"), "CreateAxumApp");
+        assert_eq!(to_pascal_case("axum-app-create"), "AxumAppCreate");
     }
 
     #[test]

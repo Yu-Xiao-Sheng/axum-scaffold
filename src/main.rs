@@ -1,16 +1,16 @@
-// create-axum-app: A CLI tool to scaffold Axum web applications
+// axum-app-create: A CLI tool to scaffold Axum web applications
 //
 // This tool generates new Axum projects with sensible defaults and optional features.
 
 use clap::Parser;
-use create_axum_app::cli::{is_non_interactive, prompts::prompt_project_config};
-use create_axum_app::generator::project::{generate_project, get_success_message};
-use create_axum_app::utils::rust_toolchain::check_rust_toolchain;
+use axum_app_create::cli::{is_non_interactive, prompts::prompt_project_config};
+use axum_app_create::generator::project::{generate_project, get_success_message};
+use axum_app_create::utils::rust_toolchain::check_rust_toolchain;
 use std::path::PathBuf;
 
 /// Simple CLI tool to scaffold Axum web applications
 #[derive(Parser, Debug)]
-#[command(name = "create-axum-app")]
+#[command(name = "axum-app-create")]
 #[command(about = "Scaffold a new Axum web application", long_about = None)]
 #[command(version = "0.1.0")]
 struct CliArgs {
@@ -38,7 +38,7 @@ fn main() -> anyhow::Result<()> {
 
     let args = CliArgs::parse();
 
-    println!("\n🦀 create-axum-app CLI Tool v0.1.0");
+    println!("\n🦀 axum-app-create CLI Tool v0.1.0");
 
     // Check Rust toolchain
     if let Err(e) = check_rust_toolchain() {

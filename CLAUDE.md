@@ -1,4 +1,4 @@
-# create-axum-app Development Guidelines
+# axum-app-create Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2026-02-06
 

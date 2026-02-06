@@ -23,7 +23,7 @@ use std::env;
 ///
 /// # Examples
 /// ```
-/// use create_axum_app::cli::is_non_interactive;
+/// use axum_app_create::cli::is_non_interactive;
 ///
 /// if is_non_interactive(false) {
 ///     println!("Running in non-interactive mode");

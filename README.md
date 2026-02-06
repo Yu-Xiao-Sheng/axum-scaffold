@@ -1,11 +1,11 @@
-# create-axum-app
+# axum-app-create
 
 > A command-line tool to quickly create Axum web applications with zero configuration
 
-[![CI](https://github.com/Yu-Xiao-Sheng/create-axum-app/workflows/CI/badge.svg)](https://github.com/Yu-Xiao-Sheng/create-axum-app/actions)
+[![CI](https://github.com/Yu-Xiao-Sheng/axum-app-create/workflows/CI/badge.svg)](https://github.com/Yu-Xiao-Sheng/axum-app-create/actions)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
 
-`create-axum-app` is a CLI tool that helps you quickly scaffold Axum web applications in Rust, similar to `create-react-app` or `cargo-generate`. It generates production-ready projects with sensible defaults, structured logging, error handling, and optional features like database support and authentication.
+`axum-app-create` is a CLI tool that helps you quickly scaffold Axum web applications in Rust, similar to `create-react-app` or `cargo-generate`. It generates production-ready projects with sensible defaults, structured logging, error handling, and optional features like database support and authentication.
 
 ## 🚀 Features
 
@@ -29,13 +29,13 @@
 
 ### From crates.io (Coming Soon)
 ```bash
-cargo install create-axum-app
+cargo install axum-app-create
 ```
 
 ### From Source
 ```bash
-git clone https://github.com/Yu-Xiao-Sheng/create-axum-app.git
-cd create-axum-app
+git clone https://github.com/Yu-Xiao-Sheng/axum-app-create.git
+cd axum-app-create
 cargo install --path .
 ```
 
@@ -43,7 +43,7 @@ cargo install --path .
 
 ### Interactive Mode (Recommended)
 ```bash
-create-axum-app my-app
+axum-app-create my-app
 # Follow the prompts to configure your project
 cd my-app
 cargo run
@@ -51,7 +51,7 @@ cargo run
 
 ### Command-Line Mode
 ```bash
-create-axum-app my-app \
+axum-app-create my-app \
   --database both \
   --auth \
   --biz-error \
@@ -63,7 +63,7 @@ cargo run
 
 ### Non-Interactive Mode (CI/CD)
 ```bash
-create-axum-app my-app --non-interactive
+axum-app-create my-app --non-interactive
 ```
 
 ## 📚 Command-Line Options
@@ -89,8 +89,8 @@ create-axum-app my-app --non-interactive
 ### Build from Source
 ```bash
 # Clone repository
-git clone https://github.com/Yu-Xiao-Sheng/create-axum-app.git
-cd create-axum-app
+git clone https://github.com/Yu-Xiao-Sheng/axum-app-create.git
+cd axum-app-create
 
 # Build
 cargo build --release
@@ -129,7 +129,7 @@ cargo clippy -- -D warnings
 - [ ] Integration tests
 - [ ] Documentation and examples
 
-See [issues](https://github.com/Yu-Xiao-Sheng/create-axum-app/issues) for detailed progress.
+See [issues](https://github.com/Yu-Xiao-Sheng/axum-app-create/issues) for detailed progress.
 
 ## 🤝 Contributing
 

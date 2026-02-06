@@ -1,4 +1,4 @@
-# CLI API Contract: create-axum-app
+# CLI API Contract: axum-app-create
 
 **Version**: 1.0.0
 **Last Updated**: 2025-02-05
@@ -6,24 +6,24 @@
 
 ## Overview
 
-The create-axum-app CLI tool provides a command-line interface for scaffolding Axum web applications. This contract defines the complete API surface including commands, flags, interactive prompts, exit codes, and error handling.
+The axum-app-create CLI tool provides a command-line interface for scaffolding Axum web applications. This contract defines the complete API surface including commands, flags, interactive prompts, exit codes, and error handling.
 
 ## Command Structure
 
 ### Basic Syntax
 
 ```bash
-create-axum-app [PROJECT_NAME] [OPTIONS]
+axum-app-create [PROJECT_NAME] [OPTIONS]
 ```
 
 ### Usage Examples
 
 ```bash
 # Interactive mode (default)
-create-axum-app
+axum-app-create
 
 # Non-interactive with all flags
-create-axum-app my-app \
+axum-app-create my-app \
   --database both \
   --auth \
   --biz-error \
@@ -32,13 +32,13 @@ create-axum-app my-app \
   --non-interactive
 
 # Partial flags (prompt for remaining)
-create-axum-app my-app --database postgresql
+axum-app-create my-app --database postgresql
 
 # Show help
-create-axum-app --help
+axum-app-create --help
 
 # Show version
-create-axum-app --version
+axum-app-create --version
 ```
 
 ## Command-Line Options
@@ -203,7 +203,7 @@ error: Directory 'my-app' already exists
 ```
 error: Rust toolchain not found
 
-  > create-axum-app requires Rust and Cargo to be installed
+  > axum-app-create requires Rust and Cargo to be installed
 
   Install from: https://rustup.rs/
 ```
@@ -214,7 +214,7 @@ error: Permission denied: cannot create directory '/opt/my-app'
 
   > Try running from your home directory or with appropriate privileges
 
-  Suggested: cd ~ && create-axum-app my-app
+  Suggested: cd ~ && axum-app-create my-app
 ```
 
 ## Output Format
@@ -322,7 +322,7 @@ When `--non-interactive` flag is set or `CI` environment variable is detected:
 ```bash
 # In CI/CD pipeline
 export CI=true
-create-axum-app test-app --database postgresql --non-interactive
+axum-app-create test-app --database postgresql --non-interactive
 ```
 
 ### Example (Scripting)
@@ -331,7 +331,7 @@ create-axum-app test-app --database postgresql --non-interactive
 #!/bin/bash
 # generate-app.sh
 
-create-axum-app "$1" \
+axum-app-create "$1" \
   --database both \
   --auth \
   --biz-error \
@@ -430,7 +430,7 @@ Language is auto-detected from environment variables:
 ```bash
 # Force Chinese
 export CREATE_AXUM_APP_LANG=zh
-create-axum-app my-app
+axum-app-create my-app
 
 # Output:
 ? 项目名称: my-app
@@ -454,13 +454,13 @@ To measure performance:
 
 ```bash
 # Generation time
-hyperfine 'create-axum-app test-app'
+hyperfine 'axum-app-create test-app'
 
 # Binary size
-ls -lh $(which create-axum-app)
+ls -lh $(which axum-app-create)
 
 # Memory usage
-/usr/bin/time -v create-axum-app test-app 2>&1 | grep "Maximum resident"
+/usr/bin/time -v axum-app-create test-app 2>&1 | grep "Maximum resident"
 ```
 
 ## Testing
@@ -487,11 +487,11 @@ Test various scenarios:
 
 ```bash
 # 1. Basic project
-create-axum-app basic-app
+axum-app-create basic-app
 cd basic-app && cargo test
 
 # 2. With all features
-create-axum-app full-app \
+axum-app-create full-app \
   --database both \
   --auth \
   --biz-error \
@@ -499,16 +499,16 @@ create-axum-app full-app \
 cd full-app && cargo test
 
 # 3. Invalid project name
-create-axum-app 123invalid
+axum-app-create 123invalid
 # Expected: Exit code 3
 
 # 4. Directory exists
 mkdir existing-app
-create-axum-app existing-app
+axum-app-create existing-app
 # Expected: Exit code 7
 
 # 5. Non-interactive mode
-create-axum-app test-app --non-interactive
+axum-app-create test-app --non-interactive
 # Expected: Success or exit code 2 if missing required values
 ```
 
@@ -533,7 +533,7 @@ The CLI follows Semantic Versioning (SemVer):
 
 The following are guaranteed to remain stable until v2.0.0:
 
-- Command structure: `create-axum-app [PROJECT_NAME] [OPTIONS]`
+- Command structure: `axum-app-create [PROJECT_NAME] [OPTIONS]`
 - Core flags: `--help`, `--version`, `--database`, `--auth`, `--biz-error`
 - Exit codes: 0 (success), 1 (error)
 - Generated project structure: `src/`, `Cargo.toml`, `README.md`
@@ -572,7 +572,7 @@ The following are planned for future releases but NOT part of Phase 1 MVP:
 ### Minimal Project
 
 ```bash
-create-axum-app minimal-app
+axum-app-create minimal-app
 ```
 
 Generates a basic Axum web server with:
@@ -586,7 +586,7 @@ Generates a basic Axum web server with:
 ### Full-Stack Project
 
 ```bash
-create-axum-app full-app \
+axum-app-create full-app \
   --database both \
   --auth \
   --biz-error \
@@ -608,7 +608,7 @@ Generates a production-ready project with:
 # In GitHub Actions
 - name: Generate test project
   run: |
-    create-axum-app test-app \
+    axum-app-create test-app \
       --database postgresql \
       --non-interactive
     cd test-app
@@ -626,4 +626,4 @@ Generates a production-ready project with:
 
 **Document Version**: 1.0.0
 **Last Updated**: 2025-02-05
-**Maintainer**: create-axum-app team
+**Maintainer**: axum-app-create team

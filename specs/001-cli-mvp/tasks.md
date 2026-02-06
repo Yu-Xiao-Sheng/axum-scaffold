@@ -1,4 +1,4 @@
-# Tasks: create-axum-app CLI Tool - Phase 1 MVP
+# Tasks: axum-app-create CLI Tool - Phase 1 MVP
 
 **Input**: Design documents from `/specs/001-cli-mvp/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/
@@ -66,7 +66,7 @@
 
 **Goal**: Generate a minimal, compilable Axum web application with sensible defaults that runs on localhost:8080
 
-**Independent Test**: Run `create-axum-app my-app` accepting all defaults → navigate to my-app → run `cargo run` → verify server starts on port 8080 and responds to GET /health with `{"status":"ok"}`
+**Independent Test**: Run `axum-app-create my-app` accepting all defaults → navigate to my-app → run `cargo run` → verify server starts on port 8080 and responds to GET /health with `{"status":"ok"}`
 
 ### Templates for User Story 1
 
@@ -106,7 +106,7 @@
 
 **Goal**: Enable optional features (database, authentication, logging, biz-error) via interactive prompts with proper integration
 
-**Independent Test**: Run `create-axum-app --database both --auth --biz-error my-custom-app` → verify generated project includes all selected features without conflicts → verify project compiles and runs
+**Independent Test**: Run `axum-app-create --database both --auth --biz-error my-custom-app` → verify generated project includes all selected features without conflicts → verify project compiles and runs
 
 ### Prompts for User Story 2
 
@@ -408,7 +408,7 @@ Task T050: "Create .env.example variant with JWT_SECRET template"
 2. Complete Phase 2: Foundational (T007-T018) - CRITICAL
 3. Complete Phase 3: User Story 1 (T019-T035)
 4. **STOP and VALIDATE**: Test User Story 1 independently
-   - Generate a project: `create-axum-app my-test-app`
+   - Generate a project: `axum-app-create my-test-app`
    - Verify it compiles: `cd my-test-app && cargo build`
    - Verify it runs: `cargo run` → GET http://127.0.0.1:8080/health
    - Measure performance: generation time <10s, startup <100ms

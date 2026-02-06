@@ -34,7 +34,7 @@ const RESERVED_KEYWORDS: &[&str] = &[
 ///
 /// # Examples
 /// ```
-/// use create_axum_app::utils::validator::validate_project_name;
+/// use axum_app_create::utils::validator::validate_project_name;
 ///
 /// assert!(validate_project_name("my-app").is_ok());
 /// assert!(validate_project_name("my_app").is_ok());
