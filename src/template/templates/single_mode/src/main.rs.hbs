@@ -1,8 +1,7 @@
-use axum::{
-    routing::get,
-    Router,
-};
+use axum::Router;
 {{#if has_logging}}
+// Allow unused imports - clippy false positive for tracing_subscriber traits
+#[allow(clippy::unused_imports)]
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 {{/if}}
 
