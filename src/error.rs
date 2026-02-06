@@ -21,6 +21,12 @@ pub enum CliError {
 
     #[error("Git error: {0}")]
     Git(String),
+
+    #[error("Toolchain error: {0}")]
+    ToolchainError(String),
+
+    #[error("Validation error: {0}")]
+    ValidationError(String),
 }
 
 /// Result type alias for CLI operations
