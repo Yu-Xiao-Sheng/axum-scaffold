@@ -4,6 +4,7 @@
 
 use clap::Parser;
 use axum_app_create::cli::{is_non_interactive, prompts::prompt_project_config};
+use axum_app_create::error::CliError;
 use axum_app_create::generator::project::{generate_project, get_success_message};
 use axum_app_create::utils::rust_toolchain::check_rust_toolchain;
 use std::path::PathBuf;
@@ -25,6 +26,24 @@ struct CliArgs {
     /// Non-interactive mode (fail if required values missing)
     #[arg(long)]
     non_interactive: bool,
+}
+
+/// Format error message with troubleshooting guidance
+fn format_error_message(error: &CliError) -> String {
+    match error {
+        CliError::Io(_) | CliError::Git(_) | CliError::Template(_) | CliError::Generation(_) => {
+            format!(
+                "{}\n\n\
+                 🔍 故障排查 / Troubleshooting:\n\
+                 1. 检查文件系统权限 / Check file system permissions\n\
+                 2. 确保磁盘空间充足 / Ensure sufficient disk space\n\
+                 3. 查看日志获取更多信息 / Check logs for more details: RUST_LOG=debug\n\
+                 4. 提交bug报告 / Report bug: https://github.com/yourusername/axum-app-create/issues",
+                error
+            )
+        }
+        _ => error.to_string(),
+    }
 }
 
 fn main() -> anyhow::Result<()> {
@@ -53,7 +72,7 @@ fn main() -> anyhow::Result<()> {
     let config = match prompt_project_config(interactive, args.project_name) {
         Ok(cfg) => cfg,
         Err(e) => {
-            eprintln!("\n❌ Error: {}", e);
+            eprintln!("\n❌ {}", e);
             std::process::exit(1);
         }
     };
@@ -69,7 +88,7 @@ fn main() -> anyhow::Result<()> {
             println!("{}", message);
         }
         Err(e) => {
-            eprintln!("\n❌ Failed to generate project: {}", e);
+            eprintln!("\n❌ {}", format_error_message(&e));
             std::process::exit(1);
         }
     }
