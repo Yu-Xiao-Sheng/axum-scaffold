@@ -1,0 +1,57 @@
+use axum::{
+    routing::get,
+    Router,
+};
+{{#if has_logging}}
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+{{/if}}
+
+#[path = "config.rs"]
+mod config;
+{{#if has_database}}
+#[path = "db.rs"]
+mod db;
+{{/if}}
+{{#if has_auth}}
+#[path = "handlers/auth.rs"]
+mod auth;
+{{/if}}
+#[path = "handlers/health.rs"]
+mod health;
+
+use config::Config;
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+{{#if has_logging}}
+    // Initialize tracing
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
+        )
+        .init();
+{{/if}}
+
+    // Load configuration
+    let config = Config::from_env()?;
+
+    // Build our application with routes
+    let app = Router::new()
+        .merge(health::router())
+        {{#if has_auth}}
+        .merge(auth::router())
+        {{/if}}
+        {{#if has_database}}
+        .with_state(config.database_url.unwrap())
+        {{/if}};
+
+    let bind_address = config.bind_address();
+    let listener = tokio::net::TcpListener::bind(&bind_address).await?;
+
+    tracing::info!("Starting server on {}", bind_address);
+
+    axum::serve(listener, app).await?;
+
+    Ok(())
+}

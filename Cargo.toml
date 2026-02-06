@@ -8,6 +8,7 @@ repository = "https://github.com/Yu-Xiao-Sheng/create-axum-app"
 readme = "README.md"
 keywords = ["axum", "cli", "web", "scaffolding", "rust"]
 categories = ["command-line-utilities", "web-programming"]
+exclude = ["test-*", "*.test"]
 
 [lib]
 path = "src/lib.rs"

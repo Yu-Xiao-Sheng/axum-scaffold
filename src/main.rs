@@ -3,7 +3,10 @@
 // This tool generates new Axum projects with sensible defaults and optional features.
 
 use clap::Parser;
-use tracing::info;
+use create_axum_app::cli::{is_non_interactive, prompts::prompt_project_config};
+use create_axum_app::generator::project::{generate_project, get_success_message};
+use create_axum_app::utils::rust_toolchain::check_rust_toolchain;
+use std::path::PathBuf;
 
 /// Simple CLI tool to scaffold Axum web applications
 #[derive(Parser, Debug)]
@@ -14,22 +17,6 @@ struct CliArgs {
     /// Project name
     #[arg(short, long)]
     project_name: Option<String>,
-
-    /// Enable database support (none, postgresql, sqlite, both)
-    #[arg(long, value_name = "DATABASE")]
-    database: Option<String>,
-
-    /// Enable JWT authentication
-    #[arg(long)]
-    auth: bool,
-
-    /// Enable business error handling
-    #[arg(long)]
-    biz_error: bool,
-
-    /// Logging level (trace, debug, info, warn, error)
-    #[arg(long, value_name = "LEVEL")]
-    log_level: Option<String>,
 
     /// Author name for generated project
     #[arg(long)]
@@ -51,25 +38,41 @@ fn main() -> anyhow::Result<()> {
 
     let args = CliArgs::parse();
 
-    info!("create-axum-app CLI Tool");
-    info!("Implementation in progress...");
+    println!("\n🦀 create-axum-app CLI Tool v0.1.0");
 
-    println!("\n🚀 create-axum-app CLI Tool");
-    println!("Version: 0.1.0");
-    println!("\nThis tool will scaffold a new Axum web application.");
-    println!("\nProject configuration:");
-    if let Some(name) = &args.project_name {
-        println!("  Project name: {}", name);
-    } else {
-        println!("  Project name: <will prompt>");
+    // Check Rust toolchain
+    if let Err(e) = check_rust_toolchain() {
+        eprintln!("\n❌ {}", e);
+        std::process::exit(1);
     }
-    println!("  Database: {:?}", args.database);
-    println!("  Authentication: {}", args.auth);
-    println!("  Business errors: {}", args.biz_error);
-    println!("  Non-interactive: {}", args.non_interactive);
 
-    println!("\n⚠️  Implementation in progress...");
-    println!("Full functionality coming soon!");
+    // Determine if we're in interactive mode
+    let interactive = !is_non_interactive(args.non_interactive);
+
+    // Get project configuration
+    let config = match prompt_project_config(interactive, args.project_name) {
+        Ok(cfg) => cfg,
+        Err(e) => {
+            eprintln!("\n❌ Error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    // Determine project directory
+    let project_dir = PathBuf::from(&config.project_name);
+
+    // Generate project
+    match generate_project(&project_dir, &config) {
+        Ok(()) => {
+            // Print success message
+            let message = get_success_message(&project_dir, &config.project_name);
+            println!("{}", message);
+        }
+        Err(e) => {
+            eprintln!("\n❌ Failed to generate project: {}", e);
+            std::process::exit(1);
+        }
+    }
 
     Ok(())
 }

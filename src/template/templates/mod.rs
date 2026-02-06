@@ -20,43 +20,99 @@ pub struct TemplateFile {
 
 /// Get all templates for single-package mode
 ///
-/// This function returns a map of template paths to their contents.
-/// In Phase 2 (foundational), this returns a minimal set.
-/// User Story 1 will populate this with actual templates.
+/// Returns a map of template paths to their contents
 pub fn get_single_mode_templates() -> HashMap<&'static str, TemplateFile> {
-    let templates = HashMap::new();
+    let mut templates = HashMap::new();
 
-    // Templates will be added in User Story 1
-    // For now, this is a placeholder
+    // Cargo.toml
+    templates.insert(
+        "Cargo.toml",
+        TemplateFile {
+            path: "Cargo.toml",
+            content: include_str!("single_mode/Cargo.toml.hbs"),
+            executable: false,
+        },
+    );
+
+    // src/main.rs
+    templates.insert(
+        "src/main.rs",
+        TemplateFile {
+            path: "src/main.rs",
+            content: include_str!("single_mode/src/main.rs.hbs"),
+            executable: false,
+        },
+    );
+
+    // src/lib.rs
+    templates.insert(
+        "src/lib.rs",
+        TemplateFile {
+            path: "src/lib.rs",
+            content: include_str!("single_mode/src/lib.rs.hbs"),
+            executable: false,
+        },
+    );
+
+    // src/config.rs
+    templates.insert(
+        "src/config.rs",
+        TemplateFile {
+            path: "src/config.rs",
+            content: include_str!("single_mode/src/config.rs.hbs"),
+            executable: false,
+        },
+    );
+
+    // src/handlers/health.rs
+    templates.insert(
+        "src/handlers/health.rs",
+        TemplateFile {
+            path: "src/handlers/health.rs",
+            content: include_str!("single_mode/src/handlers/health.rs.hbs"),
+            executable: false,
+        },
+    );
+
+    // src/handlers/mod.rs
+    templates.insert(
+        "src/handlers/mod.rs",
+        TemplateFile {
+            path: "src/handlers/mod.rs",
+            content: include_str!("single_mode/src/handlers/mod.rs.hbs"),
+            executable: false,
+        },
+    );
+
+    // .env.example
+    templates.insert(
+        ".env.example",
+        TemplateFile {
+            path: ".env.example",
+            content: include_str!("single_mode/.env.example"),
+            executable: false,
+        },
+    );
+
+    // .gitignore
+    templates.insert(
+        ".gitignore",
+        TemplateFile {
+            path: ".gitignore",
+            content: include_str!("single_mode/.gitignore"),
+            executable: false,
+        },
+    );
+
+    // README.md
+    templates.insert(
+        "README.md",
+        TemplateFile {
+            path: "README.md",
+            content: include_str!("single_mode/README.md.hbs"),
+            executable: false,
+        },
+    );
 
     templates
-}
-
-/// Get all template files
-///
-/// Returns a vector of all template file descriptors
-pub fn get_all_templates() -> Vec<TemplateFile> {
-    vec![
-        // Placeholder - templates will be added in User Story 1
-    ]
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_get_single_mode_templates() {
-        let templates = get_single_mode_templates();
-        // For now, just ensure it doesn't panic
-        // In User Story 1, this will contain actual templates
-        let _ = templates;
-    }
-
-    #[test]
-    fn test_get_all_templates() {
-        let templates = get_all_templates();
-        // For now, just ensure it returns a vector
-        let _ = templates;
-    }
 }

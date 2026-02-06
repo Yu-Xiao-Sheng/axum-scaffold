@@ -6,6 +6,7 @@ use crate::config::ProjectConfig;
 use crate::error::{CliError, Result};
 use crate::template::context::TemplateContext;
 use crate::template::engine::TemplateEngine;
+use crate::template::templates::get_single_mode_templates;
 use std::path::Path;
 
 /// Generate a new project with the given configuration
@@ -31,6 +32,9 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig) -> Result<()
         )));
     }
 
+    println!("\n🚀 Creating project: {}", config.project_name);
+    println!("📁 Location: {}", project_dir.display());
+
     // Create project directory
     std::fs::create_dir_all(project_dir)?;
 
@@ -40,32 +44,25 @@ pub fn generate_project(project_dir: &Path, config: &ProjectConfig) -> Result<()
     // Create template engine
     let engine = TemplateEngine::new();
 
-    // For now, just create basic structure
-    // Templates will be added in User Story 1
-    create_basic_structure(project_dir, &ctx, &engine)?;
+    // Get templates
+    let templates = get_single_mode_templates();
+
+    // Render and write each template
+    println!("\n📝 Generating files:");
+
+    for (name, template_file) in templates {
+        // Render template
+        let rendered = engine.render_template(name, template_file.content, &ctx)?;
+
+        // Write file
+        write_file(project_dir, template_file.path, &rendered)?;
+
+        println!("  ✓ Created {}", template_file.path);
+    }
 
     // Initialize git repository
+    println!("\n🔧 Initializing git repository...");
     super::git::init_git_repo(project_dir)?;
-
-    Ok(())
-}
-
-/// Create basic project structure
-///
-/// This is a minimal implementation - full template rendering will be added in User Story 1
-fn create_basic_structure(
-    project_dir: &Path,
-    _ctx: &TemplateContext,
-    _engine: &TemplateEngine,
-) -> Result<()> {
-    // Create src directory
-    let src_dir = project_dir.join("src");
-    std::fs::create_dir_all(&src_dir)?;
-
-    // For now, just create placeholder files
-    // Full templates will be implemented in User Story 1
-    println!("✓ Created project structure at: {}", project_dir.display());
-    println!("✓ Created src/ directory");
 
     Ok(())
 }
@@ -109,6 +106,28 @@ pub fn ensure_dir(project_dir: &Path, relative_path: &str) -> Result<()> {
     Ok(())
 }
 
+/// Get success message for project generation
+pub fn get_success_message(project_dir: &Path, project_name: &str) -> String {
+    format!(
+        r#"
+✨ Project '{}' created successfully!
+
+📂 Location: {}
+
+🚀 Next steps:
+
+  $ cd {}
+  $ cargo run
+
+Then test the health endpoint:
+  $ curl http://127.0.0.1:8080/health
+
+Happy hacking! 🦀
+"#,
+        project_name, project_dir.display(), project_name
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -136,15 +155,29 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_project_creates_directory() {
+    fn test_generate_project_creates_all_files() {
         let temp_dir = TempDir::new().unwrap();
         let project_dir = temp_dir.path().join("my-test-app");
-        let config = ProjectConfig::default();
+        let mut config = ProjectConfig::default();
+        config.project_name = "my-test-app".to_string();
 
         let result = generate_project(&project_dir, &config);
 
+        if let Err(e) = &result {
+            eprintln!("Generation error: {:?}", e);
+        }
+
         assert!(result.is_ok());
         assert!(project_dir.exists());
-        assert!(project_dir.join("src").exists());
+
+        // Verify key files were created
+        assert!(project_dir.join("Cargo.toml").exists());
+        assert!(project_dir.join("src/main.rs").exists());
+        assert!(project_dir.join("src/lib.rs").exists());
+        assert!(project_dir.join("src/config.rs").exists());
+        assert!(project_dir.join("src/handlers/health.rs").exists());
+        assert!(project_dir.join(".env.example").exists());
+        assert!(project_dir.join(".gitignore").exists());
+        assert!(project_dir.join("README.md").exists());
     }
 }

@@ -2,6 +2,7 @@
 //
 // This module builds context data for template rendering.
 
+#[allow(unused_imports)]
 use crate::config::{DatabaseConfig, DatabaseOption, FeatureSet, ProjectConfig};
 use serde::Serialize;
 
