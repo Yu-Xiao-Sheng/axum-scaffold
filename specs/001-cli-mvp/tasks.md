@@ -177,20 +177,24 @@
 
 ### Error Messages for User Story 3
 
-- [ ] T064 [P] [US3] Implement invalid project name error with naming rules explanation in src/utils/validator.rs
-- [ ] T065 [P] [US3] Implement directory exists error with overwrite/cancel prompt in src/generator/project.rs
-- [ ] T066 [P] [US3] Implement Rust toolchain missing error with installation link (https://rustup.rs/) in src/utils/rust_toolchain.rs
-- [ ] T067 [P] [US3] Implement permission denied error with alternative directory suggestion in src/generator/project.rs
-- [ ] T068 [P] [US3] Implement template rendering error with file path and line number in src/template/engine.rs
-- [ ] T069 [P] [US3] Implement generic generation failure error with troubleshooting link in src/generator/project.rs
-- [ ] T070 [US3] Add --help flag usage instructions to all error messages in src/cli/args.rs
+- [X] T064 [P] [US3] Implement invalid project name error with naming rules explanation in src/utils/validator.rs
+- [X] T065 [P] [US3] Implement directory exists error with overwrite/cancel prompt in src/generator/project.rs
+- [X] T066 [P] [US3] Implement Rust toolchain missing error with installation link (https://rustup.rs/) in src/utils/rust_toolchain.rs
+- [X] T067 [P] [US3] Implement permission denied error with alternative directory suggestion in src/generator/project.rs
+- [X] T068 [P] [US3] Implement template rendering error with file path and line number in src/template/engine.rs
+- [X] T069 [P] [US3] Implement generic generation failure error with troubleshooting link in src/generator/project.rs
+- [X] T070 [US3] Add --help flag usage instructions to all error messages in src/cli/args.rs
 
 ### Tests for User Story 3
 
-- [ ] T071 [P] [US3] Unit test: invalid project name errors (empty, starts with digit, special chars, reserved keyword) in tests/unit/error_tests.rs
-- [ ] T072 [P] [US3] Unit test: directory exists error handling and overwrite prompt in tests/unit/error_tests.rs
-- [ ] T073 [P] [US3] Unit test: Rust toolchain missing error with installation instructions in tests/unit/error_tests.rs
-- [ ] T074 [P] [US3] Integration test: trigger permission denied error → verify helpful message in tests/integration/error_tests.rs
+- [X] T071 [P] [US3] Unit test: invalid project name errors (empty, starts with digit, special chars, reserved keyword) in tests/unit/error_tests.rs
+- [X] T072 [P] [US3] Unit test: directory exists error handling and overwrite prompt in tests/unit/error_tests.rs
+- [X] T073 [P] [US3] Unit test: Rust toolchain missing error with installation instructions in tests/unit/error_tests.rs
+- [X] T074 [P] [US3] Integration test: trigger permission denied error → verify helpful message in tests/integration/error_tests.rs
+
+**✅ Phase 5 Status**: COMPLETED (2026-02-06)
+**Commits**: ffc69ac, 261f72a, 7f9690d, 5565a01, 8c13c33, 04fd222
+**Tests**: All 36 unit + integration tests passing
 
 **Checkpoint**: All user stories should now be independently functional with comprehensive error handling
 
