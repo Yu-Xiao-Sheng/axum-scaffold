@@ -15,7 +15,7 @@ pub struct Config {
 
 impl Config {
     /// Load configuration from environment variables
-    pub fn from_env() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn from_env() -> anyhow::Result<Self> {
         Ok(Self {
             host: env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string()),
             port: env::var("PORT")
