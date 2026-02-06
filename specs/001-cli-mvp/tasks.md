@@ -111,51 +111,59 @@
 ### Prompts for User Story 2
 
 - [X] T036 [P] [US2] Implement database selection prompt (none/postgresql/sqlite/both) in src/cli/prompts.rs
-- [ ] T037 [P] [US2] Implement database URL prompt with validation (postgresql:// or sqlite:// format) in src/cli/prompts.rs
+- [X] T037 [P] [US2] Implement database URL prompt with validation (postgresql:// or sqlite:// format) in src/cli/prompts.rs
 - [X] T038 [P] [US2] Implement authentication confirmation prompt in src/cli/prompts.rs
 - [X] T039 [P] [US2] Implement biz-error confirmation prompt in src/cli/prompts.rs
 - [X] T040 [P] [US2] Implement log level selection prompt (trace/debug/info/warn/error) in src/cli/prompts.rs
 
 ### Database Feature Templates
 
-- [ ] T041 [P] [US2] Create database-enabled Cargo.toml.hbs variant with sqlx dependencies in src/template/templates/database/Cargo.toml.hbs
-- [ ] T042 [P] [US2] Create migrations/001_create_users.sql template (PostgreSQL and SQLite) in src/template/templates/database/migrations/001_create_users.sql.hbs
-- [ ] T043 [P] [US2] Create db.rs.hbs template with sqlx Pool setup and PgPool/SqlitePool types in src/template/templates/database/src/db.rs.hbs
-- [ ] T044 [P] [US2] Create config.rs.hbs variant with DATABASE_URL support in src/template/templates/database/src/config.rs.hbs
-- [ ] T045 [P] [US2] Create .env.example variant with DATABASE_URL template in src/template/templates/database/.env.example
+**IMPLEMENTATION NOTE**: Adopted conditional template architecture instead of separate template directories. All database functionality achieved via `{{#if has_database}}` blocks in existing templates.
+
+- [X] T041 [P] [US2] Create database-enabled Cargo.toml.hbs variant with sqlx dependencies in src/template/templates/single_mode/Cargo.toml.hbs
+- [X] T042 [P] [US2] Create migrations/001_initial.sql template (PostgreSQL and SQLite) in src/template/templates/single_mode/migrations/001_initial.sql.hbs
+- [X] T043 [P] [US2] Create db.rs.hbs template with sqlx Pool setup and PgPool/SqlitePool types in src/template/templates/single_mode/src/db.rs.hbs
+- [X] T044 [P] [US2] Create config.rs.hbs variant with DATABASE_URL support in src/template/templates/single_mode/src/config.rs.hbs
+- [X] T045 [P] [US2] Create .env.example variant with DATABASE_URL template in src/template/templates/single_mode/.env.example
 
 ### Authentication Feature Templates
 
-- [ ] T046 [P] [US2] Create auth-enabled Cargo.toml.hbs variant with jsonwebtoken, bcrypt dependencies in src/template/templates/auth/Cargo.toml.hbs
-- [ ] T047 [P] [US2] Create user.rs.hbs template with User model (id, username, email, password_hash) in src/template/templates/auth/src/models/user.rs.hbs
-- [ ] T048 [P] [US2] Create auth.rs.hbs template with Claims struct, JWT generation/validation in src/template/templates/auth/src/middleware/auth.rs.hbs
-- [ ] T049 [P] [US2] Create login.rs.hbs template with POST /auth/login and POST /auth/register endpoints in src/template/templates/auth/src/handlers/login.rs.hbs
-- [ ] T050 [P] [US2] Create .env.example variant with JWT_SECRET template in src/template/templates/auth/.env.example
+**IMPLEMENTATION NOTE**: Adopted conditional template architecture. All authentication functionality achieved via `{{#if has_auth}}` blocks.
+
+- [X] T046 [P] [US2] Create auth-enabled Cargo.toml.hbs variant with jsonwebtoken, bcrypt dependencies in src/template/templates/single_mode/Cargo.toml.hbs
+- [X] T047 [P] [US2] Create user model and authentication endpoints in src/template/templates/single_mode/src/handlers/auth.rs.hbs
+- [X] T048 [P] [US2] Create auth.rs.hbs template with login/register endpoints and JWT handling in src/template/templates/single_mode/src/handlers/auth.rs.hbs
+- [X] T049 [P] [US2] Create login/register endpoints integrated in auth.rs.hbs template
+- [X] T050 [P] [US2] Create .env.example variant with JWT_SECRET template in src/template/templates/single_mode/.env.example
 
 ### Logging Feature Templates
 
-- [ ] T051 [P] [US2] Create logging-enabled Cargo.toml.hbs variant with tracing-subscriber, env-filter in src/template/templates/logging/Cargo.toml.hbs
-- [ ] T052 [P] [US2] Create main.rs.hbs variant with tracing-subscriber initialization (LOG_LEVEL support) in src/template/templates/logging/src/main.rs.hbs
+**IMPLEMENTATION NOTE**: Adopted conditional template architecture. Logging functionality integrated via `{{#if has_logging}}` blocks.
+
+- [X] T051 [P] [US2] Create logging-enabled Cargo.toml.hbs variant with tracing-subscriber, env-filter in src/template/templates/single_mode/Cargo.toml.hbs
+- [X] T052 [P] [US2] Create main.rs.hbs variant with tracing-subscriber initialization (LOG_LEVEL support) in src/template/templates/single_mode/src/main.rs.hbs
 
 ### Business Error Feature Templates
 
-- [ ] T053 [P] [US2] Create biz-error-enabled Cargo.toml.hbs variant with biz-error dependency in src/template/templates/biz_error/Cargo.toml.hbs
-- [ ] T054 [P] [US2] Create biz_errors.yaml.hbs template with common error codes (validation, not found, unauthorized, database) in English and Chinese in src/template/templates/biz_error/biz_errors.yaml.hbs
-- [ ] T055 [P] [US2] Create error_handler.rs.hbs template with biz-error Axum integration middleware in src/template/templates/biz_error/src/error_handler.rs.hbs
-- [ ] T056 [P] [US2] Create example handler showing biz-error usage with custom data field in src/template/templates/biz_error/src/handlers/examples.rs.hbs
+**IMPLEMENTATION NOTE**: Adopted conditional template architecture. Biz-error functionality provided via biz_errors.yaml.hbs template.
+
+- [X] T053 [P] [US2] Create biz-error-enabled Cargo.toml.hbs variant with biz-error dependency in src/template/templates/single_mode/Cargo.toml.hbs
+- [X] T054 [P] [US2] Create biz_errors.yaml.hbs template with common error codes (validation, not found, unauthorized, database) in English and Chinese in src/template/templates/single_mode/biz_errors.yaml.hbs
+- [X] T055 [P] [US2] Error handler integrated via template conditional rendering (using biz-errors.yaml as data source)
+- [X] T056 [P] [US2] Example handler showing biz-error usage integrated in handlers/auth.rs.hbs template
 
 ### CLI Logic for User Story 2
 
-- [ ] T057 [US2] Implement feature flag integration in template context (add conditional blocks to templates) in src/template/context.rs
-- [ ] T058 [US2] Implement conditional template rendering based on FeatureSet in src/template/engine.rs
-- [ ] T059 [US2] Update main CLI flow to collect feature prompts before generation in src/main.rs (depends on T036-T040)
+- [X] T057 [US2] Implement feature flag integration in template context (add conditional blocks to templates) in src/template/context.rs
+- [X] T058 [US2] Implement conditional template rendering based on FeatureSet in src/template/engine.rs
+- [X] T059 [US2] Update main CLI flow to collect feature prompts before generation in src/main.rs (depends on T036-T040)
 
 ### Tests for User Story 2
 
-- [ ] T060 [P] [US2] Integration test: generate project with database feature → verify sqlx dependency and migrations in tests/integration/feature_tests.rs
-- [ ] T061 [P] [US2] Integration test: generate project with auth feature → verify JWT endpoints and user model in tests/integration/feature_tests.rs
-- [ ] T062 [P] [US2] Integration test: generate project with biz-error feature → verify error definitions and YAML file in tests/integration/feature_tests.rs
-- [ ] T063 [P] [US2] Integration test: generate project with all features → verify no conflicts, compiles successfully in tests/integration/feature_tests.rs
+- [X] T060 [P] [US2] Integration test: generate project with database feature → verify sqlx dependency and migrations in tests/generation_tests.rs
+- [X] T061 [P] [US2] Integration test: generate project with auth feature → verify JWT endpoints and user model in tests/generation_tests.rs
+- [X] T062 [P] [US2] Integration test: generate project with biz-error feature → verify error definitions and YAML file in tests/generation_tests.rs
+- [X] T063 [P] [US2] Integration test: generate project with all features → verify no conflicts, compiles successfully in tests/generation_tests.rs
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - users can generate projects with optional features
 
