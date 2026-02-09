@@ -54,6 +54,7 @@ pub fn is_non_interactive(explicit_flag: bool) -> bool {
 /// Basic TTY detection
 ///
 /// Returns true if stdout appears to be a terminal
+#[allow(clippy::needless_return)] // Explicit return needed for clarity with cfg attributes
 fn is_tty() -> bool {
     // Try to check if we're in a terminal
     // This is a simplified check - for robust detection, use atty or is-terminal crate
@@ -64,9 +65,7 @@ fn is_tty() -> bool {
         if fs::metadata("/dev/stdout").is_ok() {
             // Check file type (TTY devices have specific permissions)
             // This is a heuristic - not 100% reliable
-            true
-        } else {
-            false
+            return true;
         }
     }
 
@@ -74,12 +73,12 @@ fn is_tty() -> bool {
     {
         // On Windows, assume we might be in a terminal unless in CI
         // For production, use windows-sys or winapi to check properly
-        true
+        return true;
     }
 
+    // Default to assuming TTY if we can't determine
     #[cfg(not(windows))]
     {
-        // Default to assuming TTY if we can't determine (non-Windows platforms)
         true
     }
 }
