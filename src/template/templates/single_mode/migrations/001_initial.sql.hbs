@@ -1,0 +1,33 @@
+{{#if has_postgresql}}
+-- PostgreSQL: Initial schema for {{project_name}}
+{{#if has_auth}}
+-- Users table for authentication
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+{{/if}}
+
+-- Add more tables as needed for your application
+{{/if}}
+
+{{#if has_sqlite}}
+-- SQLite: Initial schema for {{project_name}}
+{{#if has_auth}}
+-- Users table for authentication
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+);
+{{/if}}
+
+-- Add more tables as needed for your application
+{{/if}}

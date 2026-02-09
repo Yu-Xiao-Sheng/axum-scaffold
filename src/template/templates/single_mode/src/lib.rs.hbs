@@ -1,0 +1,11 @@
+//! {{project_name}}
+//!
+//! A generated Axum web application.
+
+pub mod config;
+pub mod handlers;
+{{#if has_database}}
+pub mod db;
+{{/if}}
+
+pub use config::Config;

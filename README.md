@@ -1,100 +1,533 @@
-# create-axum-app
+# axum-app-create
 
-> A command-line tool to quickly create Axum web applications
+> 快速创建 Axum Web 应用的命令行工具 / A command-line tool to quickly create Axum web applications with zero configuration
 
-[![Crates.io](https://img.shields.io/crates/v/create-axum-app)](https://crates.io/crates/create-axum-app)
+[![CI](https://github.com/Yu-Xiao-Sheng/axum-app-create/workflows/CI/badge.svg)](https://github.com/Yu-Xiao-Sheng/axum-app-create/actions)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
+[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org)
 
-`create-axum-app` is a CLI tool that helps you quickly scaffold Axum web applications in Rust, similar to how `create-next-app` works for Next.js projects.
+`axum-app-create` 是一个用于快速搭建 Axum Web 应用的 CLI 工具，类似于 `create-react-app` 或 `cargo-generate`。它能生成生产就绪的项目，包含合理的默认配置、结构化日志、错误处理以及可选的数据库支持和身份认证功能。
 
-## 🚀 Features
+`axum-app-create` is a CLI tool that helps you quickly scaffold Axum web applications in Rust. It generates production-ready projects with sensible defaults, structured logging, error handling, and optional features like database support and JWT authentication.
 
-### Single Project Mode
-- Quick-start single-module Axum application
-- Perfect for learning and small projects
-- Minimal setup, maximum productivity
+---
 
-### Workspace Mode (Enterprise-Grade)
-- Multi-module workspace architecture
-- Ideal for large-scale applications
-- Organized structure for team collaboration
+## 📚 Table of Contents / 目录
 
-**Workspace Architecture:**
+- [Features / 功能特性](#-features-功能特性)
+- [Installation / 安装](#-installation-安装)
+- [Quick Start / 快速开始](#-quick-start-快速开始)
+- [Command-Line Options / 命令行选项](#-command-line-options-命令行选项)
+- [Examples / 使用示例](#-examples-使用示例)
+- [Development / 开发指南](#-development-开发指南)
+- [Troubleshooting / 故障排查](#-troubleshooting-故障排查)
+- [Roadmap / 路线图](#-roadmap-路线图)
+- [Contributing / 贡献指南](#-contributing-贡献指南)
+- [License / 许可证](#-license-许可证)
+
+---
+
+## ✨ Features / 功能特性
+
+### Core Features / 核心功能
+
+- ✅ **Single Project Mode / 单项目模式**: Generate single-package Axum applications / 生成单包 Axum 应用
+- ✅ **Interactive Prompts / 交互式提示**: Friendly CLI with interactive configuration / 友好的交互式配置界面
+- ✅ **Sensible Defaults / 合理默认值**: Works out of the box with zero configuration / 开箱即用，零配置
+- ✅ **Production-Ready Templates / 生产就绪模板**: Includes tracing, error handling, proper structure / 包含日志、错误处理、规范结构
+- ✅ **Bilingual Documentation / 双语文档**: English and Chinese (中文) support / 英文和中文支持
+- ✅ **Git Initialization / Git 初始化**: Automatic git repo, .gitignore, and initial commit / 自动初始化 Git 仓库
+
+### Optional Features / 可选功能
+
+- 🗄️ **Database Support / 数据库支持**: PostgreSQL, SQLite, or both / 支持 PostgreSQL、SQLite 或两者
+- 🔐 **JWT Authentication / JWT 认证**: Built-in user registration and login endpoints / 内置用户注册和登录端点
+- 📝 **Business Error Handling / 业务错误处理**: YAML-based i18n error definitions / 基于 YAML 的国际化错误定义
+- 📊 **Structured Logging / 结构化日志**: Configurable log levels with tracing / 可配置的日志级别
+
+---
+
+## 📦 Installation / 安装
+
+### Prerequisites / 前置要求
+
+- Rust toolchain 1.75+ / Rust 工具链 1.75+
+- Git (for project initialization / 用于项目初始化)
+
+Install Rust / 安装 Rust:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
-create-axum-app/
-├── common/          # Global shared modules
-│   ├── Infrastructure
-│   ├── Utilities
-│   └── Components
-├── module/          # Business modules
-│   ├── user-module/
-│   ├── order-module/
-│   └── ... (multiple business modules)
-└── provider/        # Axum service providers
-    ├── api-provider/
-    ├── admin-provider/
-    └── ... (multiple service modules)
-```
 
-## 📦 Installation
+### From crates.io (Recommended / 推荐)
 
 ```bash
-cargo install create-axum-app
+cargo install axum-app-create
 ```
 
-## 🦀 Quick Start
-
-### Create a Single Project
+### From Source / 从源码安装
 
 ```bash
-create-axum-app my-app --mode single
+git clone https://github.com/Yu-Xiao-Sheng/axum-app-create.git
+cd axum-app-create
+cargo install --path .
 ```
 
-### Create a Workspace Project
+### Build from Source / 从源码构建
 
 ```bash
-create-axum-app my-workspace --mode workspace
+git clone https://github.com/Yu-Xiao-Sheng/axum-app-create.git
+cd axum-app-create
+cargo build --release
+
+# Binary location / 二进制文件位置:
+# Linux/macOS: ./target/release/axum-app-create
+# Windows: .\target\release\axum-app-create.exe
 ```
 
-### Interactive Mode
+---
+
+## 🚀 Quick Start / 快速开始
+
+### Interactive Mode / 交互式模式 (Recommended / 推荐)
 
 ```bash
-create-axum-app my-app
-# Follow the prompts to configure your project
+axum-app-create my-app
+# Follow the prompts / 按照提示配置项目
+cd my-app
+cargo run
 ```
 
-## 🛠️ Roadmap
+The CLI will prompt you to configure / CLI 将提示您配置:
+- Database support (PostgreSQL, SQLite, or none) / 数据库支持
+- Authentication (JWT endpoints) / 认证功能
+- Logging level / 日志级别
+- Business error handling / 业务错误处理
 
-- [ ] CLI command implementation
-- [ ] Single project template
-- [ ] Workspace project template
-- [ ] Interactive configuration wizard
-- [ ] Custom template support
-- [ ] Plugin system
+### With All Features / 包含所有功能
 
-## 📚 Documentation
+```bash
+axum-app-create my-app \
+  --database both \
+  --auth \
+  --biz-error \
+  --log-level info
 
-Coming soon! For now, please refer to the [issues](https://github.com/Yu-Xiao-Sheng/create-axum-app/issues) for development progress.
+cd my-app
+cargo run
+```
 
-## 🤝 Contributing
+### Minimal Project / 最小项目
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```bash
+axum-app-create minimal-app --non-interactive
+cd minimal-app
+cargo run
+```
 
-## 📄 License
+### Test Your API / 测试 API
+
+```bash
+# Health check / 健康检查
+curl http://127.0.0.1:8080/health
+
+# Expected response / 预期响应:
+{"status":"ok","version":"0.1.0"}
+```
+
+---
+
+## 🎛️ Command-Line Options / 命令行选项
+
+### Full Usage / 完整用法
+
+```bash
+axum-app-create [PROJECT_NAME] [OPTIONS]
+```
+
+### Options / 选项
+
+| Flag / 标志 | Short / 短选项 | Description / 描述 | Default / 默认值 |
+|-------------|----------------|-------------------|------------------|
+| `--project-name <NAME>` | `-p` | Set project name / 设置项目名称 | Prompted / 提示输入 |
+| `--database <DB>` | `-d` | Database: `none`, `postgresql`, `sqlite`, `both` / 数据库类型 | Prompted / 提示输入 |
+| `--auth` | `-a` | Enable JWT authentication / 启用 JWT 认证 | Prompted / 提示输入 |
+| `--biz-error` | `-b` | Enable business error handling / 启用业务错误处理 | Prompted / 提示输入 |
+| `--log-level <LEVEL>` | `-l` | Logging: `trace`, `debug`, `info`, `warn`, `error` / 日志级别 | Prompted / 提示输入 |
+| `--author <NAME>` | | Author name for generated project / 项目作者名称 | Git config / Git 配置 |
+| `--non-interactive` | | Disable prompts / 禁用交互提示 (fail if required values missing / 缺少必需值时失败) | `false` |
+| `--help` | `-h` | Show help message / 显示帮助信息 | - |
+| `--version` | `-V` | Show version / 显示版本 | - |
+
+### Examples / 示例
+
+```bash
+# Interactive with all features / 交互式启用所有功能
+axum-app-create myapp
+
+# PostgreSQL only / 仅 PostgreSQL
+axum-app-create myapp --database postgresql
+
+# With auth and logging / 包含认证和日志
+axum-app-create myapp --auth --log-level debug
+
+# Minimal, non-interactive / 最小化、非交互式
+axum-app-create myapp --non-interactive
+
+# Full featured / 完整功能
+axum-app-create myapp \
+  --database both \
+  --auth \
+  --biz-error \
+  --log-level info \
+  --author "Your Name"
+```
+
+---
+
+## 📖 Examples / 使用示例
+
+### Example 1: Simple API Server / 简单 API 服务器
+
+```bash
+axum-app-create simple-api --non-interactive
+cd simple-api
+cargo run
+```
+
+Generates / 生成:
+- Basic Axum server / 基础 Axum 服务器
+- Health check endpoint / 健康检查端点
+- Structured logging / 结构化日志
+- Error handling / 错误处理
+- Git repository / Git 仓库
+
+### Example 2: Full-Stack Application / 全栈应用
+
+```bash
+axum-app-create fullstack-app \
+  --database postgresql \
+  --auth \
+  --biz-error \
+  --log-level info
+
+cd fullstack-app
+
+# Configure environment / 配置环境
+cp .env.example .env
+# Edit .env with your database URL and JWT secret / 编辑数据库 URL 和 JWT 密钥
+
+# Run migrations (if database enabled) / 运行迁移
+cargo run
+
+# Test the API / 测试 API
+curl http://127.0.0.1:8080/health
+curl -X POST http://127.0.0.1:8080/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"password123"}'
+```
+
+### Example 3: SQLite for Development / SQLite 开发环境
+
+```bash
+axum-app-create dev-app --database sqlite --log-level debug
+cd dev-app
+cargo run
+```
+
+Perfect for / 适用于:
+- Local development / 本地开发
+- Small applications / 小型应用
+- Quick prototypes / 快速原型
+
+### Example 4: Custom Author Name / 自定义作者名称
+
+```bash
+axum-app-create myapp --author "Jane Developer" --non-interactive
+```
+
+---
+
+## 🛠️ Development / 开发指南
+
+### Prerequisites / 前置要求
+
+- Rust 1.75+ / Rust 工具链 1.75+
+- Git / 版本控制
+
+### Build Commands / 构建命令
+
+```bash
+# Clone repository / 克隆仓库
+git clone https://github.com/Yu-Xiao-Sheng/axum-app-create.git
+cd axum-app-create
+
+# Development build / 开发构建
+cargo build
+
+# Release build / 发布构建
+cargo build --release
+
+# Run CLI / 运行 CLI
+cargo run -- --help
+```
+
+### Testing / 测试
+
+```bash
+# Run all tests / 运行所有测试
+cargo test
+
+# Run tests with output / 运行测试并显示输出
+cargo test -- --nocapture
+
+# Run specific test / 运行特定测试
+cargo test test_project_name_validation
+```
+
+### Code Quality / 代码质量
+
+```bash
+# Format code / 格式化代码
+cargo fmt
+
+# Check formatting / 检查格式
+cargo fmt -- --check
+
+# Run linter / 运行代码检查
+cargo clippy -- -D warnings
+
+# Fix lints automatically / 自动修复
+cargo clippy --fix
+```
+
+### Documentation / 文档
+
+```bash
+# Generate and open documentation / 生成并打开文档
+cargo doc --open
+```
+
+---
+
+## 🔧 Troubleshooting / 故障排查
+
+### Common Issues / 常见问题
+
+#### Issue: "Permission denied" when creating project / 创建项目时权限被拒绝
+
+**Error / 错误**:
+```
+❌ 权限拒绝 / Permission denied: 无法访问目录 / cannot access directory
+```
+
+**Solutions / 解决方案**:
+1. Check directory permissions / 检查目录权限: `ls -la /path/to/parent`
+2. Use a directory you have write access to / 使用有写权限的目录: `cd ~`
+3. Use temporary directory / 使用临时目录: `/tmp/my-project`
+4. Check available disk space / 检查可用磁盘空间: `df -h`
+
+#### Issue: "Directory already exists" / 目录已存在
+
+**Error / 错误**:
+```
+❌ 目录已存在 / Directory already exists: 'my-app'
+```
+
+**Solutions / 解决方案**:
+1. Remove existing directory / 删除现有目录: `rm -rf my-app`
+2. Use different name / 使用不同名称: `axum-app-create my-app-2`
+3. Interactive mode will prompt to overwrite / 交互式模式会提示是否覆盖
+
+#### Issue: Generated project fails to compile / 生成的项目编译失败
+
+**Error / 错误**:
+```
+error: linking with `cc` failed
+```
+
+**Solutions / 解决方案**:
+1. Update Rust toolchain / 更新 Rust 工具链: `rustup update`
+2. Clean and rebuild / 清理并重新构建: `cd my-app && cargo clean && cargo build`
+3. Check system dependencies / 检查系统依赖:
+   - Linux: `sudo apt install build-essential pkg-config`
+   - macOS: `xcode-select --install`
+   - Windows: Install [Build Tools](https://visualstudio.microsoft.com/downloads/)
+
+#### Issue: Database connection fails / 数据库连接失败
+
+**Error / 错误**:
+```
+Error: Database connection failed
+```
+
+**Solutions / 解决方案**:
+1. Verify DATABASE_URL in .env / 验证 .env 中的 DATABASE_URL
+2. Check database is running / 检查数据库是否运行:
+   - PostgreSQL: `sudo service postgresql status`
+   - SQLite: No service needed / 无需服务
+3. Test connection manually / 手动测试连接:
+   - PostgreSQL: `psql $DATABASE_URL`
+   - Run migrations / 运行迁移: `cargo run -- migrate`
+
+#### Issue: Template rendering errors / 模板渲染错误
+
+**Error / 错误**:
+```
+Error: Failed to render template
+```
+
+**Solutions / 解决方案**:
+1. Check project name follows Cargo naming conventions / 检查项目名称是否符合 Cargo 命名规范
+2. Report bug with: `RUST_LOG=debug axum-app-create myapp > debug.log`
+3. Open issue on GitHub / 在 GitHub 上提交问题
+
+### Debug Mode / 调试模式
+
+Enable debug logging for more details / 启用调试日志获取更多详情:
+
+```bash
+RUST_LOG=debug axum-app-create myapp
+```
+
+### Getting Help / 获取帮助
+
+```bash
+# Show help / 显示帮助
+axum-app-create --help
+
+# Show version / 显示版本
+axum-app-create --version
+
+# Report bugs / 报告 Bug
+https://github.com/Yu-Xiao-Sheng/axum-app-create/issues
+```
+
+---
+
+## 🗺️ Roadmap / 路线图
+
+### Phase 1 MVP ✅ (Complete / 已完成)
+
+- [x] CLI argument parsing with clap / 使用 clap 解析命令行参数
+- [x] Interactive prompts with inquire / 使用 inquire 实现交互式提示
+- [x] Template rendering with Handlebars / 使用 Handlebars 渲染模板
+- [x] Project name validation / 项目名称验证
+- [x] Embedded project templates / 嵌入式项目模板
+- [x] Git initialization / Git 初始化
+- [x] Optional feature templates (database, auth, logging, biz-error) / 可选功能模板
+- [x] Integration tests / 集成测试
+- [x] Bilingual documentation (English + Chinese) / 双语文档（英文+中文）
+
+### Phase 2: Enhanced Features 🚧 (Planned / 计划中)
+
+- [ ] Workspace mode (multi-package projects) / 工作区模式（多包项目）
+- [ ] Custom template system / 自定义模板系统
+- [ ] Template inheritance / 模板继承
+- [ ] Interactive configuration presets / 交互式配置预设
+- [ ] Project update mechanism / 项目更新机制
+
+### Phase 3: Ecosystem Integration 🔮 (Future / 未来)
+
+- [ ] Plugin system / 插件系统
+- [ ] Template marketplace / 模板市场
+- [ ] CI/CD integration (GitHub Actions, GitLab CI) / CI/CD 集成
+- [ ] Docker generation / Docker 生成
+- [ ] Deployment helpers / 部署助手
+
+See [issues](https://github.com/Yu-Xiao-Sheng/axum-app-create/issues) for detailed progress and to suggest features.
+
+查看 [issues](https://github.com/Yu-Xiao-Sheng/axum-app-create/issues) 了解详细进度或建议功能。
+
+---
+
+## 🤝 Contributing / 贡献指南
+
+Contributions are welcome! Please feel free to submit pull requests or open issues.
+
+欢迎贡献！请随时提交 Pull Request 或创建 Issue。
+
+### Development Setup / 开发环境设置
+
+```bash
+# Fork and clone / Fork 并克隆仓库
+git clone https://github.com/YOUR-USERNAME/axum-app-create.git
+cd axum-app-create
+
+# Install dependencies / 安装依赖
+cargo build
+
+# Run tests / 运行测试
+cargo test
+
+# Format code / 格式化代码
+cargo fmt
+
+# Run linter / 运行代码检查
+cargo clippy -- -D warnings
+```
+
+### Pull Request Process / PR 流程
+
+1. Fork the repository / Fork 仓库
+2. Create a feature branch / 创建功能分支: `git checkout -b feature/amazing-feature`
+3. Make your changes / 进行更改
+4. Write tests for new features / 为新功能编写测试
+5. Ensure all tests pass / 确保所有测试通过: `cargo test`
+6. Format code / 格式化代码: `cargo fmt`
+7. Run clippy / 运行 clippy: `cargo clippy -- -D warnings`
+8. Commit your changes / 提交更改: `git commit -m 'Add amazing feature'`
+9. Push to the branch / 推送到分支: `git push origin feature/amazing-feature`
+10. Open a Pull Request / 打开 Pull Request
+
+### Code Style / 代码风格
+
+- Follow Rust 2024 Edition conventions / 遵循 Rust 2024 Edition 规范
+- Use `cargo fmt` for formatting / 使用 `cargo fmt` 格式化
+- Pass `cargo clippy -- -D warnings` / 通过 `cargo clippy -- -D warnings` 检查
+- Add tests for new features / 为新功能添加测试
+- Update documentation as needed / 根据需要更新文档
+
+---
+
+## 📄 License / 许可证
 
 This project is licensed under either of:
+本项目采用以下任一许可证:
 
 - MIT License ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 - Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
 
 at your option.
-
-## 🙏 Acknowledgments
-
-- [Axum](https://github.com/tokio-rs/axum) - Ergonomic and modular web framework built with Tokio
-- [Tower](https://github.com/tower-rs/tower) - Library of modular and reusable components
-- Inspired by [create-next-app](https://github.com/vercel/next.js/tree/canary/packages/create-next-app)
+由您选择。
 
 ---
 
-**Note**: This project is currently under active development. The APIs and features may change before the 1.0 release.
+## 🙏 Acknowledgments / 致谢
+
+Built with great open-source tools:
+基于优秀的开源工具构建:
+
+- [Axum](https://github.com/tokio-rs/axum) - Ergonomic and modular web framework / 优雅的模块化 Web 框架
+- [Tokio](https://tokio.rs/) - Async runtime / 异步运行时
+- [clap](https://github.com/clap-rs/clap) - Command-line argument parser / 命令行参数解析器
+- [inquire](https://github.com/mikaelmello/inquire) - Interactive prompts / 交互式提示
+- [handlebars-rust](https://github.com/sunng87/handlebars-rust) - Template engine / 模板引擎
+- [SQLx](https://github.com/launchbadge/sqlx) - Database toolkit / 数据库工具包
+- Inspired by / 灵感来源:
+  - [create-react-app](https://github.com/facebook/create-react-app)
+  - [cargo-generate](https://github.com/cargo-generate/cargo-generate)
+
+---
+
+**Current Version / 当前版本**: 0.1.0
+
+**Status / 状态**: Phase 1 MVP Complete / Phase 1 MVP 已完成 ✅
+
+**Year / 年份**: 2025
+
+---
+
+<p align="center">
+  <i>Built with ❤️ by the Rust community / 由 Rust 社区用 ❤️ 构建</i>
+</p>

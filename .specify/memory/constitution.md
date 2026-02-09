@@ -7,7 +7,7 @@ Sync Impact Report:
 - Follow-up TODOs: None
 -->
 
-# create-axum-app Constitution
+# axum-app-create Constitution
 
 ## Core Principles
 
@@ -80,7 +80,7 @@ The tool architecture MUST support user customization without forking:
 
 - **Custom templates**: Users can provide local or remote template repositories
 - **Template hooks**: `pre-generate`, `post-generate`, `pre-build`, `post-build` hooks for custom logic
-- **Plugin API**: Well-defined interface for third-party extensions (e.g., `create-axum-app-auth`, `create-axum-app-graphql`)
+- **Plugin API**: Well-defined interface for third-party extensions (e.g., `axum-app-create-auth`, `axum-app-create-graphql`)
 - **Template marketplace**: Community-contributed templates with discovery and rating
 
 **Constraints**: Core tool behavior cannot be overridden by plugins (security guardrails). Plugins run in subprocess isolation.
@@ -118,6 +118,107 @@ Once released, the tool MUST maintain backward compatibility or provide clear mi
 **Exception**: Pre-1.0 releases may break compatibility with migration guides provided.
 
 **Rationale**: Developers upgrade tools infrequently. Breaking changes waste time and erode trust. Stability enables adoption in teams and enterprises.
+
+### VII. Communication Language Standard (用户沟通语言标准)
+
+所有与用户的需求分析、报告、计划和文档输出必须使用中文。
+
+**Language Requirements**:
+- **Requirements Analysis**: All feature specifications, user stories, and requirements MUST be documented in Chinese
+- **Progress Reports**: All status updates, progress reports, and completion summaries MUST be in Chinese
+- **Documentation**: User-facing documentation, README files, and guides MUST be in Chinese (with English translations optional)
+- **Error Messages**: Error messages shown to users SHOULD be in Chinese or bilingual
+- **Code Comments**: Generated code comments MAY use Chinese for clarity when appropriate
+
+**Exceptions**:
+- Technical terms without established Chinese translations MAY use English (e.g., "crate", "macro", "trait")
+- API references and official documentation links MAY remain in original language
+- Internal technical documentation between developers MAY use English
+
+**Rationale**: 本项目主要服务中文用户社区。使用中文进行需求分析和报告可以确保准确传达意图，减少理解偏差，提高协作效率。英语保留用于技术术语和国际化的场景。
+
+### VIII. Git提交消息标准 (Git Commit Message Standards)
+
+**Git commit messages MUST be generated based on actual code changes, not specification document updates.**
+
+**Git提交信息必须基于实际代码变动生成，而不是根据规范文档的更新生成。**
+
+#### Core Principles / 核心原则
+
+1. **Code-Focused Messages** / **代码导向的消息**
+   - Commit messages describe WHAT changed in the codebase
+   - 提交信息描述代码库中改变了什么
+   - References to task IDs (T001, T002) are discouraged unless essential
+   - 除非必要，否则不鼓励引用任务ID (T001, T002)
+
+2. **Specification Integration** / **规范集成**
+   - Specification updates should be bundled with related code changes
+   - 规范更新应该与相关代码变更一起提交
+   - Separate spec-only commits require strong justification
+   - 单独的规范提交需要强有力的理由
+
+#### Commit Message Format / 提交信息格式
+
+```
+<type>: <concise description of code change>
+
+<detailed explanation (if needed)>
+
+- Key code changes
+- Technical decisions
+- Impact on functionality
+```
+
+**Allowed Types** / **允许的类型**:
+- `feat`: New feature (新功能)
+- `fix`: Bug fix (修复bug)
+- `refactor`: Code restructuring without behavior change (重构)
+- `docs`: Documentation update (unless spec-only) (文档更新，除非仅规范)
+- `test`: Test additions or modifications (测试添加或修改)
+- `chore`: Maintenance tasks (维护任务)
+
+#### Examples / 示例
+
+**Good Examples** / **好的示例**:
+```
+✅ feat: implement database connection pooling with PgPool
+
+Add PgPool and SqlitePool support with automatic connection
+management and migration support.
+
+- Implement db.rs with Pool enum for multi-database support
+- Add migration runner for automatic schema updates
+- Configure connection limits (min: 1, max: 10)
+```
+
+```
+✅ fix: resolve template rendering issue with nested blocks
+
+Fixed handlebars template rendering when feature blocks contain
+nested conditional logic. Updated template engine to properly
+handle recursive {{#if}} directives.
+```
+
+**Bad Examples** / **不好的示例**:
+```
+❌ feat: complete Phase 2 tasks (Too vague / 太模糊)
+
+❌ docs: update tasks.md for T012-T018 (Spec-only / 仅规范)
+
+❌ feat: implement T007-T011 (Task reference only / 仅任务引用)
+```
+
+#### Enforcement / 执行
+
+- Maintainers SHOULD reject commits that only update specification documents
+- 维护者应该拒绝仅更新规范文档的提交
+- If specification requires separate update, explain business rationale in commit message
+- 如果规范需要单独更新，在提交信息中解释业务理由
+- CI/CD MAY check for prohibited patterns (e.g., "complete TXXX", "update tasks.md")
+- CI/CD可以检查禁止模式（例如"完成TXXX"、"更新tasks.md"）
+
+**Rationale / 理由**: Code changes are the source of truth. Git history should reflect what actually changed in the implementation, making it easier to understand project evolution and debug issues. Spec documents are planning artifacts; commits are execution records.
+代码变更是真相的来源。Git历史应该反映实际实施中的变化，使其更容易理解项目演化和调试问题。规范文档是规划工件；提交是执行记录。
 
 ## Testing Requirements
 
@@ -184,4 +285,4 @@ Non-trivial features (e.g., new CLI modes, template engines) MUST follow TDD:
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2025-02-05 | **Last Amended**: 2025-02-05
+**Version**: 1.2.0 | **Ratified**: 2025-02-05 | **Last Amended**: 2026-02-06

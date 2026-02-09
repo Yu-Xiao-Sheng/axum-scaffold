@@ -1,1 +1,35 @@
+# Rust
 /target
+/debug
+/release
+*.rs.bk
+*.rlib
+*.prof*
+*.pdb
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Claude
+.claude
+
+# Test coverage
+tarpaulin-report.html
+cobertura.xml

@@ -1,0 +1,4 @@
+active: dev
+port: 10000
+log_level: info
+log_path: /data/axum-scaffold/logs
