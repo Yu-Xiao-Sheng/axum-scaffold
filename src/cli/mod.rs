@@ -75,7 +75,8 @@ fn is_tty() -> bool {
         return true;
     }
 
-    // Default to assuming TTY if we can't determine
+    // Default to assuming TTY if we can't determine (non-Windows platforms)
+    #[cfg(not(windows))]
     true
 }
 
