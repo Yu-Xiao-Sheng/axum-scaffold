@@ -64,7 +64,9 @@ fn is_tty() -> bool {
         if fs::metadata("/dev/stdout").is_ok() {
             // Check file type (TTY devices have specific permissions)
             // This is a heuristic - not 100% reliable
-            return true;
+            true
+        } else {
+            false
         }
     }
 
@@ -72,12 +74,14 @@ fn is_tty() -> bool {
     {
         // On Windows, assume we might be in a terminal unless in CI
         // For production, use windows-sys or winapi to check properly
-        return true;
+        true
     }
 
-    // Default to assuming TTY if we can't determine (non-Windows platforms)
     #[cfg(not(windows))]
-    true
+    {
+        // Default to assuming TTY if we can't determine (non-Windows platforms)
+        true
+    }
 }
 
 #[cfg(test)]
