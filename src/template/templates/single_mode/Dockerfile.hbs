@@ -1,0 +1,35 @@
+# ============================================================
+# Multi-stage Dockerfile for {{project_name}}
+# 多阶段构建 Dockerfile
+#
+# Build: docker build -t {{project_name}} .
+# Run:   docker run -p 8080:8080 --env-file .env {{project_name}}
+# ============================================================
+
+# Stage 1: Build / 构建阶段
+FROM rust:1.85 AS builder
+WORKDIR /app
+
+# Install musl target for static linking / 安装 musl 目标用于静态链接
+RUN rustup target add x86_64-unknown-linux-musl
+RUN apt-get update && apt-get install -y musl-tools musl-dev && rm -rf /var/lib/apt/lists/*
+
+# Copy project files / 拷贝项目文件
+COPY . .
+
+# Build release binary / 编译发布版本
+RUN cargo build --target x86_64-unknown-linux-musl --release
+
+# Stage 2: Runtime / 运行阶段
+FROM scratch
+
+WORKDIR /app
+
+# Copy binary from builder / 从构建阶段复制二进制文件
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/{{project_name}} /app/{{project_name}}
+
+# Expose port / 暴露端口
+EXPOSE 8080
+
+# Set entrypoint / 设置入口点
+ENTRYPOINT ["/app/{{project_name}}"]

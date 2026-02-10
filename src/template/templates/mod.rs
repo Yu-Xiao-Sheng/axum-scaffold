@@ -163,5 +163,25 @@ pub fn get_single_mode_templates() -> HashMap<&'static str, TemplateFile> {
         },
     );
 
+    // Dockerfile
+    templates.insert(
+        "Dockerfile",
+        TemplateFile {
+            path: "Dockerfile",
+            content: include_str!("single_mode/Dockerfile.hbs"),
+            executable: false,
+        },
+    );
+
+    // .dockerignore
+    templates.insert(
+        ".dockerignore",
+        TemplateFile {
+            path: ".dockerignore",
+            content: include_str!("single_mode/.dockerignore"),
+            executable: false,
+        },
+    );
+
     templates
 }
