@@ -14,7 +14,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(name = "axum-app-create")]
 #[command(about = "Scaffold a new Axum web application", long_about = None)]
-#[command(version = "0.1.0")]
+#[command(version = "0.1.1")]
 struct CliArgs {
     /// Project name (positional argument or --project-name)
     #[arg(value_name = "PROJECT_NAME")]
@@ -79,7 +79,7 @@ fn main() -> anyhow::Result<()> {
 
     let args = CliArgs::parse();
 
-    println!("\n🦀 axum-app-create CLI Tool v0.1.0");
+    println!("\n🦀 axum-app-create CLI Tool v0.1.1");
 
     // Check Rust toolchain
     if let Err(e) = check_rust_toolchain() {

@@ -525,7 +525,7 @@ Built with great open-source tools:
 
 ---
 
-**Current Version / 当前版本**: 0.1.0
+**Current Version / 当前版本**: 0.1.1
 
 **Status / 状态**: Phase 1 MVP Complete / Phase 1 MVP 已完成 ✅
 
