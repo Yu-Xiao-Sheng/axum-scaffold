@@ -142,6 +142,21 @@ pub fn generate_project(
     println!("\n🔧 Initializing git repository...");
     super::git::init_git_repo(project_dir)?;
 
+    // Update dependencies to latest compatible versions
+    println!("📦 Updating dependencies to latest compatible versions...");
+    let update_output = std::process::Command::new("cargo")
+        .arg("update")
+        .current_dir(project_dir)
+        .output();
+    match update_output {
+        Ok(output) if output.status.success() => {
+            println!("  ✓ Dependencies updated");
+        }
+        _ => {
+            println!("  ⚠ Could not update dependencies, run `cargo update` manually");
+        }
+    }
+
     Ok(())
 }
 
