@@ -33,3 +33,6 @@ Thumbs.db
 # Test coverage
 tarpaulin-report.html
 cobertura.xml
+
+# Generated test projects
+test_project/

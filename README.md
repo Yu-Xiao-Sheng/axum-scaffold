@@ -142,22 +142,23 @@ curl http://127.0.0.1:8080/health
 ### Full Usage / 完整用法
 
 ```bash
-axum-app-create [PROJECT_NAME] [OPTIONS]
+axum-app-create [OPTIONS] [PROJECT_NAME]
 ```
 
 ### Options / 选项
 
-| Flag / 标志 | Short / 短选项 | Description / 描述 | Default / 默认值 |
-|-------------|----------------|-------------------|------------------|
-| `--project-name <NAME>` | `-p` | Set project name / 设置项目名称 | Prompted / 提示输入 |
-| `--database <DB>` | `-d` | Database: `none`, `postgresql`, `sqlite`, `both` / 数据库类型 | Prompted / 提示输入 |
-| `--auth` | `-a` | Enable JWT authentication / 启用 JWT 认证 | Prompted / 提示输入 |
-| `--biz-error` | `-b` | Enable business error handling / 启用业务错误处理 | Prompted / 提示输入 |
-| `--log-level <LEVEL>` | `-l` | Logging: `trace`, `debug`, `info`, `warn`, `error` / 日志级别 | Prompted / 提示输入 |
-| `--author <NAME>` | | Author name for generated project / 项目作者名称 | Git config / Git 配置 |
-| `--non-interactive` | | Disable prompts / 禁用交互提示 (fail if required values missing / 缺少必需值时失败) | `false` |
-| `--help` | `-h` | Show help message / 显示帮助信息 | - |
-| `--version` | `-V` | Show version / 显示版本 | - |
+| Flag / 标志 | Description / 描述 | Default / 默认值 |
+|-------------|-------------------|------------------|
+| `[PROJECT_NAME]` | Project name (positional argument) / 项目名称（位置参数） | Prompted / 提示输入 |
+| `--database <TYPE>` | Database: `none`, `postgresql`, `sqlite`, `both` / 数据库类型 | Prompted / 提示输入 |
+| `--auth` | Enable JWT authentication / 启用 JWT 认证 | Prompted / 提示输入 |
+| `--biz-error` | Enable business error handling / 启用业务错误处理 | Prompted / 提示输入 |
+| `--log-level <LEVEL>` | Logging: `trace`, `debug`, `info`, `warn`, `error` / 日志级别 | Prompted / 提示输入 |
+| `--author <NAME>` | Author name for generated project / 项目作者名称 | Git config / Git 配置 |
+| `--force` | Force overwrite if target directory exists / 强制覆盖已存在的目录 | `false` |
+| `--non-interactive` | Disable prompts / 禁用交互提示 (fail if required values missing / 缺少必需值时失败) | `false` |
+| `--help`, `-h` | Show help message / 显示帮助信息 | - |
+| `--version`, `-V` | Show version / 显示版本 | - |
 
 ### Examples / 示例
 
@@ -173,6 +174,9 @@ axum-app-create myapp --auth --log-level debug
 
 # Minimal, non-interactive / 最小化、非交互式
 axum-app-create myapp --non-interactive
+
+# Force overwrite existing project / 强制覆盖已存在的项目
+axum-app-create myapp --force
 
 # Full featured / 完整功能
 axum-app-create myapp \
@@ -335,9 +339,10 @@ cargo doc --open
 ```
 
 **Solutions / 解决方案**:
-1. Remove existing directory / 删除现有目录: `rm -rf my-app`
-2. Use different name / 使用不同名称: `axum-app-create my-app-2`
-3. Interactive mode will prompt to overwrite / 交互式模式会提示是否覆盖
+1. Use `--force` flag to overwrite / 使用 `--force` 标志覆盖: `axum-app-create my-app --force`
+2. Remove existing directory / 删除现有目录: `rm -rf my-app`
+3. Use different name / 使用不同名称: `axum-app-create my-app-2`
+4. Interactive mode will prompt to overwrite / 交互式模式会提示是否覆盖
 
 #### Issue: Generated project fails to compile / 生成的项目编译失败
 
@@ -524,7 +529,7 @@ Built with great open-source tools:
 
 **Status / 状态**: Phase 1 MVP Complete / Phase 1 MVP 已完成 ✅
 
-**Year / 年份**: 2025
+**Year / 年份**: 2026
 
 ---
 

@@ -153,5 +153,15 @@ pub fn get_single_mode_templates() -> HashMap<&'static str, TemplateFile> {
         },
     );
 
+    // build.rs (for biz-error code generation)
+    templates.insert(
+        "build.rs",
+        TemplateFile {
+            path: "build.rs",
+            content: include_str!("single_mode/build.rs.hbs"),
+            executable: false,
+        },
+    );
+
     templates
 }

@@ -1,9 +1,4 @@
 use axum::Router;
-{{#if has_logging}}
-// Allow unused imports - clippy false positive for tracing_subscriber traits
-#[allow(clippy::unused_imports)]
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-{{/if}}
 
 #[path = "config.rs"]
 mod config;
@@ -35,14 +30,17 @@ async fn main() -> anyhow::Result<()> {
     // Load configuration
     let config = Config::from_env()?;
 
+{{#if has_database}}
+    // TODO: Initialize database connection pool
+    // let pool = db::DbPool::from_env().await?;
+    // pool.run_migrations().await?;
+{{/if}}
+
     // Build our application with routes
     let app = Router::new()
         .merge(health::router())
         {{#if has_auth}}
         .merge(auth::router())
-        {{/if}}
-        {{#if has_database}}
-        .with_state(config.database_url.unwrap())
         {{/if}};
 
     let bind_address = config.bind_address();

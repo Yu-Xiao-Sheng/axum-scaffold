@@ -20,6 +20,7 @@ use std::path::Path;
 /// * `project_dir` - Path where the project should be created
 /// * `config` - Project configuration
 /// * `interactive` - Whether to prompt for user input on conflicts
+/// * `force` - Force overwrite if directory exists
 ///
 /// # Returns
 /// * `Ok(())` if generation succeeded
@@ -28,64 +29,73 @@ pub fn generate_project(
     project_dir: &Path,
     config: &ProjectConfig,
     interactive: bool,
+    force: bool,
 ) -> Result<()> {
     // Validate project directory doesn't exist
     if project_dir.exists() {
-        // In non-interactive mode, fail immediately
-        if !interactive {
+        // --force flag: delete and recreate
+        if force {
+            println!(
+                "🗑️  --force: 正在删除现有目录 / Deleting existing directory: '{}'",
+                project_dir.display()
+            );
+            std::fs::remove_dir_all(project_dir)?;
+        } else if !interactive {
+            // In non-interactive mode without --force, fail immediately
             return Err(CliError::Generation(format!(
                 "❌ 目录已存在 / Directory already exists: '{}'\n\n\
                  💡 修复建议 / Fix:\n\
                  - 删除现有目录 / Remove existing directory: rm -rf {}\n\
                  - 使用不同的名称 / Use a different name\n\
-                 - 如果确认要覆盖，请使用 --force 标志 / If you want to overwrite, use --force flag\n\
+                 - 使用 --force 标志强制覆盖 / Use --force flag to overwrite\n\
                  - 查看帮助 / View help: axum-app-create --help",
                 project_dir.display(),
                 project_dir.display()
             )));
-        }
+        } else {
+            // In interactive mode, prompt for action
+            println!(
+                "\n⚠️  警告 / Warning: 目录已存在 / Directory already exists: '{}'",
+                project_dir.display()
+            );
+            println!("📁 位置 / Location: {}", project_dir.display());
+            println!();
 
-        // In interactive mode, prompt for action
-        println!(
-            "\n⚠️  警告 / Warning: 目录已存在 / Directory already exists: '{}'",
-            project_dir.display()
-        );
-        println!("📁 位置 / Location: {}", project_dir.display());
-        println!();
+            // Use inquire for user choice
+            let options = vec![
+                "覆盖 / Overwrite - Delete existing directory and regenerate",
+                "取消 / Cancel - Abort project generation",
+                "重命名 / Rename - Keep existing directory, use different name",
+            ];
 
-        // Use inquire for user choice
-        let options = vec![
-            "覆盖 / Overwrite - Delete existing directory and regenerate",
-            "取消 / Cancel - Abort project generation",
-            "重命名 / Rename - Keep existing directory, use different name",
-        ];
+            let ans =
+                inquire::Select::new("请选择操作 / Choose an action:", options).prompt()?;
 
-        let ans = inquire::Select::new("请选择操作 / Choose an action:", options).prompt()?;
-
-        match ans {
-            "覆盖 / Overwrite - Delete existing directory and regenerate" => {
-                println!("🗑️  正在删除现有目录 / Deleting existing directory...");
-                std::fs::remove_dir_all(project_dir)?;
-                println!("✓ 已删除 / Deleted");
-            }
-            "取消 / Cancel - Abort project generation" => {
-                println!("❌ 已取消 / Aborted");
-                return Err(CliError::Generation(
-                    "项目生成已取消 / Project generation cancelled by user".to_string(),
-                ));
-            }
-            "重命名 / Rename - Keep existing directory, use different name" => {
-                println!(
-                    "❌ 请使用不同的项目名称重新运行 / Please run again with a different project name"
-                );
-                return Err(CliError::Generation(
-                    "请使用不同的项目名称 / Please use a different project name".to_string(),
-                ));
-            }
-            _ => {
-                return Err(CliError::Generation(
-                    "无效选择 / Invalid choice".to_string(),
-                ));
+            match ans {
+                "覆盖 / Overwrite - Delete existing directory and regenerate" => {
+                    println!("🗑️  正在删除现有目录 / Deleting existing directory...");
+                    std::fs::remove_dir_all(project_dir)?;
+                    println!("✓ 已删除 / Deleted");
+                }
+                "取消 / Cancel - Abort project generation" => {
+                    println!("❌ 已取消 / Aborted");
+                    return Err(CliError::Generation(
+                        "项目生成已取消 / Project generation cancelled by user".to_string(),
+                    ));
+                }
+                "重命名 / Rename - Keep existing directory, use different name" => {
+                    println!(
+                        "❌ 请使用不同的项目名称重新运行 / Please run again with a different project name"
+                    );
+                    return Err(CliError::Generation(
+                        "请使用不同的项目名称 / Please use a different project name".to_string(),
+                    ));
+                }
+                _ => {
+                    return Err(CliError::Generation(
+                        "无效选择 / Invalid choice".to_string(),
+                    ));
+                }
             }
         }
     }
@@ -117,6 +127,11 @@ pub fn generate_project(
         // Render template
         let rendered = engine.render_template(name, template_file.content, &ctx)?;
 
+        // Skip files that render to empty content (conditional templates)
+        if rendered.trim().is_empty() {
+            continue;
+        }
+
         // Write file
         write_file(project_dir, template_file.path, &rendered)?;
 
@@ -145,7 +160,7 @@ fn handle_permission_error(error: std::io::Error, path: &Path) -> Result<()> {
             format!(
                 "❌ 权限拒绝 / Permission denied: 无法访问目录 / cannot access directory: '{}'\n\n\
                  💡 修复建议 / Fix:\n\
-                 1. 使用 --force 标志 / Use --force flag\n\
+                 1. 使用 --force 标志强制覆盖 / Use --force flag to overwrite\n\
                  2. 切换到用户目录 / Switch to user directory: cd ~\n\
                  3. 使用临时目录 / Use temp directory: /tmp/my-project\n\
                  4. 检查目录权限 / Check directory permissions: ls -la {}\n\
@@ -303,7 +318,7 @@ mod tests {
         let mut config = ProjectConfig::default();
         config.project_name = "my-test-app".to_string();
 
-        let result = generate_project(&project_dir, &config, false);
+        let result = generate_project(&project_dir, &config, false, false);
 
         if let Err(e) = &result {
             eprintln!("Generation error: {:?}", e);

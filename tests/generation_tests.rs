@@ -18,7 +18,7 @@ fn test_generate_basic_project() {
         ..Default::default()
     };
 
-    let result = generate_project(&project_dir, &config, false);
+    let result = generate_project(&project_dir, &config, false, false);
     assert!(
         result.is_ok(),
         "Project generation failed: {:?}",
@@ -64,7 +64,7 @@ fn test_generated_project_compiles() {
     };
 
     // Generate project
-    let result = generate_project(&project_dir, &config, false);
+    let result = generate_project(&project_dir, &config, false, false);
     assert!(
         result.is_ok(),
         "Project generation failed: {:?}",
@@ -118,7 +118,7 @@ fn test_health_endpoint_exists() {
     };
 
     // Generate project
-    let result = generate_project(&project_dir, &config, false);
+    let result = generate_project(&project_dir, &config, false, false);
     assert!(
         result.is_ok(),
         "Project generation failed: {:?}",
@@ -153,7 +153,7 @@ fn test_gitignore_patterns() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config, false).unwrap();
+    generate_project(&project_dir, &config, false, false).unwrap();
 
     let gitignore = project_dir.join(".gitignore");
     let content = std::fs::read_to_string(&gitignore).unwrap();
@@ -175,7 +175,7 @@ fn test_readme_bilingual() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config, false).unwrap();
+    generate_project(&project_dir, &config, false, false).unwrap();
 
     let readme = project_dir.join("README.md");
     let content = std::fs::read_to_string(&readme).unwrap();
@@ -202,7 +202,7 @@ fn test_database_feature() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config, false).unwrap();
+    generate_project(&project_dir, &config, false, false).unwrap();
 
     // Verify db.rs exists
     assert!(project_dir.join("src/db.rs").exists());
@@ -236,7 +236,7 @@ fn test_auth_feature() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config, false).unwrap();
+    generate_project(&project_dir, &config, false, false).unwrap();
 
     // Verify auth handler exists
     assert!(project_dir.join("src/handlers/auth.rs").exists());
@@ -268,7 +268,7 @@ fn test_biz_error_feature() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config, false).unwrap();
+    generate_project(&project_dir, &config, false, false).unwrap();
 
     // Verify biz_errors.yaml exists
     assert!(project_dir.join("biz_errors.yaml").exists());
@@ -298,7 +298,7 @@ fn test_multiple_features() {
         ..Default::default()
     };
 
-    generate_project(&project_dir, &config, false).unwrap();
+    generate_project(&project_dir, &config, false, false).unwrap();
 
     // Verify all feature files exist
     assert!(project_dir.join("src/db.rs").exists());
@@ -317,4 +317,183 @@ fn test_multiple_features() {
     assert!(env_example.contains("DATABASE_URL"));
     assert!(env_example.contains("JWT_SECRET"));
     assert!(env_example.contains("LOG_LEVEL"));
+}
+
+/// Test: auth-only project (no database) compiles with `cargo check`
+/// This verifies the auth.rs.hbs template generates valid code without database imports
+#[test]
+fn test_auth_only_project_compiles() {
+    use axum_app_create::config::FeatureSet;
+
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("auth-only-app");
+
+    let config = ProjectConfig {
+        project_name: "auth-only-app".to_string(),
+        features: FeatureSet {
+            authentication: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    generate_project(&project_dir, &config, false, false).unwrap();
+
+    // Run cargo check to verify it compiles
+    let output = Command::new("cargo")
+        .arg("check")
+        .arg("--manifest-path")
+        .arg(project_dir.join("Cargo.toml"))
+        .output()
+        .expect("Failed to run cargo check");
+
+    if !output.status.success() {
+        eprintln!(
+            "cargo check stderr: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    assert!(
+        output.status.success(),
+        "Auth-only generated project failed to compile"
+    );
+}
+
+/// Test: --force flag overwrites existing directory
+#[test]
+fn test_force_overwrite() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("force-test-app");
+
+    let config = ProjectConfig {
+        project_name: "force-test-app".to_string(),
+        ..Default::default()
+    };
+
+    // Generate first time
+    generate_project(&project_dir, &config, false, false).unwrap();
+    assert!(project_dir.exists());
+
+    // Generate again with force=true should succeed
+    let result = generate_project(&project_dir, &config, false, true);
+    assert!(result.is_ok(), "Force overwrite failed: {:?}", result.err());
+    assert!(project_dir.join("Cargo.toml").exists());
+}
+
+/// Test: existing directory without force in non-interactive mode should fail
+#[test]
+fn test_existing_dir_no_force_fails() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("noforce-test-app");
+
+    let config = ProjectConfig {
+        project_name: "noforce-test-app".to_string(),
+        ..Default::default()
+    };
+
+    // Generate first time
+    generate_project(&project_dir, &config, false, false).unwrap();
+
+    // Generate again without force should fail
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_err(), "Should fail when directory exists without --force");
+}
+
+/// Test: project with ALL features enabled compiles with `cargo check`
+/// This is the critical integration test that catches template type mismatches
+#[test]
+fn test_all_features_project_compiles() {
+    use axum_app_create::config::{DatabaseOption, FeatureSet};
+
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("all-features-app");
+
+    let config = ProjectConfig {
+        project_name: "all-features-app".to_string(),
+        features: FeatureSet {
+            database: DatabaseOption::Both,
+            authentication: true,
+            logging: true,
+            biz_error: true,
+        },
+        ..Default::default()
+    };
+
+    generate_project(&project_dir, &config, false, false).unwrap();
+
+    // Verify biz-error dependency and build.rs in Cargo.toml
+    let cargo_toml = std::fs::read_to_string(project_dir.join("Cargo.toml")).unwrap();
+    assert!(
+        cargo_toml.contains("biz-error"),
+        "Cargo.toml should contain biz-error dependency"
+    );
+    assert!(
+        cargo_toml.contains("[build-dependencies]"),
+        "Cargo.toml should have [build-dependencies] section"
+    );
+
+    // Verify build.rs exists
+    assert!(
+        project_dir.join("build.rs").exists(),
+        "build.rs should be generated for biz-error codegen"
+    );
+
+    // Run cargo check to verify it compiles
+    let output = Command::new("cargo")
+        .arg("check")
+        .arg("--manifest-path")
+        .arg(project_dir.join("Cargo.toml"))
+        .output()
+        .expect("Failed to run cargo check");
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        eprintln!("cargo check stderr:\n{}", stderr);
+    }
+
+    assert!(
+        output.status.success(),
+        "All-features generated project failed to compile"
+    );
+}
+
+/// Test: project with database + auth compiles (the specific combo that was broken)
+#[test]
+fn test_database_auth_project_compiles() {
+    use axum_app_create::config::{DatabaseOption, FeatureSet};
+
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("db-auth-app");
+
+    let config = ProjectConfig {
+        project_name: "db-auth-app".to_string(),
+        features: FeatureSet {
+            database: DatabaseOption::PostgreSQL,
+            authentication: true,
+            logging: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    generate_project(&project_dir, &config, false, false).unwrap();
+
+    // Run cargo check
+    let output = Command::new("cargo")
+        .arg("check")
+        .arg("--manifest-path")
+        .arg(project_dir.join("Cargo.toml"))
+        .output()
+        .expect("Failed to run cargo check");
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        eprintln!("cargo check stderr:\n{}", stderr);
+    }
+
+    assert!(
+        output.status.success(),
+        "Database+Auth generated project failed to compile"
+    );
 }

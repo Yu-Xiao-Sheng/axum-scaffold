@@ -1,0 +1,13 @@
+{{#if has_biz_error}}
+{{{{raw}}}}
+fn main() {
+    println!("cargo:rerun-if-changed=biz_errors.yaml");
+
+    biz_error::codegen::generate_error_codes(
+        "biz_errors.yaml",
+        "src/error_codes.rs",
+    )
+    .expect("Failed to generate error codes from biz_errors.yaml");
+}
+{{{{/raw}}}}
+{{/if}}

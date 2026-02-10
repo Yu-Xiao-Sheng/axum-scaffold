@@ -1,36 +1,18 @@
 {{#if has_auth}}
 use axum::{
-    extract::State,
     http::StatusCode,
-    response::{IntoResponse, Response},
+    response::IntoResponse,
     Json,
+    routing::post,
+    Router,
 };
 use serde::{Deserialize, Serialize};
-{{#if has_database}}
-use sqlx::{Pool, Postgres};
-{{/if}}
-
-{{#if has_database}}
-/// User model
-#[derive(Debug, Serialize, Deserialize)]
-pub struct User {
-    pub id: i32,
-    pub username: String,
-    pub email: String,
-}
 
 /// Login request
 #[derive(Debug, Deserialize)]
 pub struct LoginRequest {
     pub username: String,
     pub password: String,
-}
-
-/// Login response
-#[derive(Debug, Serialize)]
-pub struct LoginResponse {
-    pub token: String,
-    pub user: User,
 }
 
 /// Register request
@@ -41,87 +23,65 @@ pub struct RegisterRequest {
     pub password: String,
 }
 
+/// Auth response
+#[derive(Debug, Serialize)]
+pub struct AuthResponse {
+    pub token: String,
+    pub username: String,
+}
+
 /// Handler: POST /auth/login
+///
+/// TODO: Implement actual login logic:
+{{#if has_database}}
+///   1. Query user from database using sqlx
+///   2. Verify password with bcrypt
+{{else}}
+///   1. Verify credentials against your data source
+{{/if}}
+///   3. Generate JWT token with jsonwebtoken crate
 pub async fn login(
-    State(pool): State<Pool<Postgres>>,
     Json(req): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    // TODO: Implement actual login logic
-    // 1. Query user from database
-    // 2. Verify password with bcrypt
-    // 3. Generate JWT token
-
-    // Placeholder response
-    let response = LoginResponse {
+    // Placeholder response - replace with real implementation
+    let _password = req.password; // TODO: verify password
+    let response = AuthResponse {
         token: "placeholder_jwt_token".to_string(),
-        user: User {
-            id: 1,
-            username: req.username.clone(),
-            email: "user@example.com".to_string(),
-        },
+        username: req.username,
     };
 
     Ok(Json(response))
 }
 
 /// Handler: POST /auth/register
+///
+/// TODO: Implement actual registration logic:
+{{#if has_database}}
+///   1. Hash password with bcrypt
+///   2. Insert user into database using sqlx
+{{else}}
+///   1. Hash password with bcrypt
+///   2. Store user in your data source
+{{/if}}
+///   3. Generate JWT token with jsonwebtoken crate
 pub async fn register(
-    State(pool): State<Pool<Postgres>>,
     Json(req): Json<RegisterRequest>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    // TODO: Implement actual registration logic
-    // 1. Hash password with bcrypt
-    // 2. Insert user into database
-    // 3. Generate JWT token
-
-    // Placeholder response
-    let response = LoginResponse {
+    // Placeholder response - replace with real implementation
+    let _password = req.password; // TODO: hash with bcrypt
+    let _email = req.email; // TODO: validate and store
+    let response = AuthResponse {
         token: "placeholder_jwt_token".to_string(),
-        user: User {
-            id: 1,
-            username: req.username.clone(),
-            email: req.email,
-        },
+        username: req.username,
     };
 
     Ok(Json(response))
 }
 
 /// Router for authentication routes
-pub fn router() -> axum::Router {
-    axum::Router::new()
-        .route("/auth/login", axum::routing::post(login))
-        .route("/auth/register", axum::routing::post(register))
+pub fn router() -> Router {
+    Router::new()
+        .route("/auth/login", post(login))
+        .route("/auth/register", post(register))
 }
-{{else}}
-/// Login request
-#[derive(Debug, Deserialize)]
-pub struct LoginRequest {
-    pub username: String,
-    pub password: String,
-}
-
-/// Login response (placeholder - without database, this is just an example)
-#[derive(Debug, Serialize)]
-pub struct LoginResponse {
-    pub message: String,
-}
-
-/// Handler: POST /auth/login (placeholder)
-pub async fn login(
-    Json(req): Json<LoginRequest>,
-) -> Result<impl IntoResponse, StatusCode> {
-    // Placeholder: In production, verify credentials against database
-    let response = LoginResponse {
-        message: format!("Login attempt for user: {}", req.username),
-    };
-
-    Ok(Json(response))
-}
-
-/// Router for authentication routes
-pub fn router() -> axum::Router {
-    axum::Router::new().route("/auth/login", axum::routing::post(login))
-}
-{{/if}}
 {{/if}}

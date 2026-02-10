@@ -6,6 +6,16 @@ use crate::config::{DatabaseOption, FeatureSet, ProjectConfig};
 use crate::utils::validator::validate_project_name;
 use inquire::{Confirm, Select, Text};
 
+/// CLI overrides for non-interactive mode
+#[derive(Debug, Default)]
+pub struct CliOverrides {
+    pub database: Option<DatabaseOption>,
+    pub auth: Option<bool>,
+    pub biz_error: Option<bool>,
+    pub log_level: Option<String>,
+    pub author: Option<String>,
+}
+
 /// Prompt for project name
 ///
 /// Returns None if in non-interactive mode and no name provided
@@ -126,11 +136,15 @@ pub fn prompt_log_level(interactive: bool) -> String {
 
 /// Build complete ProjectConfig from interactive prompts
 ///
-/// This is the main entry point for collecting user input
+/// This is the main entry point for collecting user input.
+/// CLI overrides take precedence over interactive prompts.
 pub fn prompt_project_config(
     interactive: bool,
     default_name: Option<String>,
+    overrides: Option<CliOverrides>,
 ) -> Result<ProjectConfig, String> {
+    let overrides = overrides.unwrap_or_default();
+
     // Get project name
     let project_name = if let Some(name) = default_name {
         // Validate provided name
@@ -144,15 +158,28 @@ pub fn prompt_project_config(
         return Err("Project name is required in non-interactive mode".to_string());
     };
 
-    // Get other optional information
-    let author_name = prompt_author_name(interactive);
+    // Get author name (CLI override > prompt > git detection)
+    let author_name = if overrides.author.is_some() {
+        overrides.author
+    } else {
+        prompt_author_name(interactive)
+    };
+
     let description = prompt_description(interactive);
 
-    // Collect feature selections
-    let database_option = prompt_database(interactive);
-    let authentication = prompt_authentication(interactive);
-    let biz_error = prompt_biz_error(interactive);
-    let log_level = prompt_log_level(interactive);
+    // Collect feature selections (CLI overrides take precedence)
+    let database_option = overrides
+        .database
+        .unwrap_or_else(|| prompt_database(interactive));
+    let authentication = overrides
+        .auth
+        .unwrap_or_else(|| prompt_authentication(interactive));
+    let biz_error = overrides
+        .biz_error
+        .unwrap_or_else(|| prompt_biz_error(interactive));
+    let log_level = overrides
+        .log_level
+        .unwrap_or_else(|| prompt_log_level(interactive));
 
     // Build feature set
     let features = FeatureSet {

@@ -23,5 +23,14 @@ jsonwebtoken = "9"
 bcrypt = "0.15"
 {{/if}}
 
+{{#if has_biz_error}}
+biz-error = { version = "0.1", features = ["codegen"] }
+{{/if}}
+
 [dev-dependencies]
 tokio-test = "0.4"
+
+{{#if has_biz_error}}
+[build-dependencies]
+biz-error = { version = "0.1", features = ["codegen"] }
+{{/if}}
