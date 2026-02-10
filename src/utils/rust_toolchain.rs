@@ -6,7 +6,7 @@ use crate::error::{CliError, Result};
 use std::process::Command;
 
 /// Minimum required Rust version (in semantic version format)
-const MIN_RUST_VERSION: &str = "1.75.0";
+const MIN_RUST_VERSION: &str = "1.85.0";
 
 /// Check if Rust toolchain is installed and meets minimum version requirements
 ///
@@ -95,7 +95,7 @@ fn check_command(command: &str, args: &[&str]) -> Result<String> {
 /// Compare two semantic version strings
 ///
 /// # Arguments
-/// * `current` - Current version string (e.g., "1.75.0")
+/// * `current` - Current version string (e.g., "1.85.0")
 /// * `minimum` - Minimum required version string
 ///
 /// # Returns
@@ -114,7 +114,7 @@ fn version_meets_minimum(current: &str, minimum: &str) -> bool {
 /// Get the current Rust version string
 ///
 /// # Returns
-/// * `Ok(String)` containing the version (e.g., "rustc 1.75.0")
+/// * `Ok(String)` containing the version (e.g., "rustc 1.85.0")
 /// * `Err(CliError)` if rustc is not available
 pub fn get_rust_version() -> Result<String> {
     check_command("rustc", &["--version"])
@@ -123,7 +123,7 @@ pub fn get_rust_version() -> Result<String> {
 /// Get the current Cargo version string
 ///
 /// # Returns
-/// * `Ok(String)` containing the version (e.g., "cargo 1.75.0")
+/// * `Ok(String)` containing the version (e.g., "cargo 1.85.0")
 /// * `Err(CliError)` if cargo is not available
 pub fn get_cargo_version() -> Result<String> {
     check_command("cargo", &["--version"])
@@ -135,17 +135,18 @@ mod tests {
 
     #[test]
     fn test_version_comparison() {
-        assert!(version_meets_minimum("1.75.0", "1.75.0"));
-        assert!(version_meets_minimum("1.76.0", "1.75.0"));
-        assert!(version_meets_minimum("2.0.0", "1.75.0"));
-        assert!(!version_meets_minimum("1.74.0", "1.75.0"));
-        assert!(!version_meets_minimum("1.0.0", "1.75.0"));
+        assert!(version_meets_minimum("1.85.0", "1.85.0"));
+        assert!(version_meets_minimum("1.86.0", "1.85.0"));
+        assert!(version_meets_minimum("1.93.0", "1.85.0"));
+        assert!(version_meets_minimum("2.0.0", "1.85.0"));
+        assert!(!version_meets_minimum("1.84.0", "1.85.0"));
+        assert!(!version_meets_minimum("1.75.0", "1.85.0"));
     }
 
     #[test]
     fn test_version_parsing() {
         // Test with non-standard version formats
-        assert!(version_meets_minimum("1.75.0-nightly", "1.75.0"));
-        assert!(version_meets_minimum("1.75.0-beta", "1.75.0"));
+        assert!(version_meets_minimum("1.85.0-nightly", "1.85.0"));
+        assert!(version_meets_minimum("1.85.0-beta", "1.85.0"));
     }
 }

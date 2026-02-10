@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/Yu-Xiao-Sheng/axum-app-create/workflows/CI/badge.svg)](https://github.com/Yu-Xiao-Sheng/axum-app-create/actions)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
-[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org)
+[![Rust](https://img.shields.io/badge/rust-1.85%2B-orange.svg)](https://www.rust-lang.org)
 
 `axum-app-create` 是一个用于快速搭建 Axum Web 应用的 CLI 工具，类似于 `create-react-app` 或 `cargo-generate`。它能生成生产就绪的项目，包含合理的默认配置、结构化日志、错误处理以及可选的数据库支持和身份认证功能。
 
@@ -51,7 +51,7 @@
 
 ### Prerequisites / 前置要求
 
-- Rust toolchain 1.75+ / Rust 工具链 1.75+
+- Rust toolchain 1.85+ / Rust 工具链 1.85+
 - Git (for project initialization / 用于项目初始化)
 
 Install Rust / 安装 Rust:
@@ -226,7 +226,7 @@ cargo run
 
 # Test the API / 测试 API
 curl http://127.0.0.1:8080/health
-curl -X POST http://127.0.0.1:8080/register \
+curl -X POST http://127.0.0.1:8080/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"testuser","password":"password123"}'
 ```
@@ -256,7 +256,7 @@ axum-app-create myapp --author "Jane Developer" --non-interactive
 
 ### Prerequisites / 前置要求
 
-- Rust 1.75+ / Rust 工具链 1.75+
+- Rust 1.85+ / Rust 工具链 1.85+
 - Git / 版本控制
 
 ### Build Commands / 构建命令
@@ -500,8 +500,8 @@ cargo clippy -- -D warnings
 This project is licensed under either of:
 本项目采用以下任一许可证:
 
-- MIT License ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT License ([LICENSE](LICENSE) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0 ([LICENSE](LICENSE) or http://www.apache.org/licenses/LICENSE-2.0)
 
 at your option.
 由您选择。

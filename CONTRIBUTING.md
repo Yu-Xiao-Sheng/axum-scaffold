@@ -33,7 +33,7 @@ Thank you for your interest in contributing to `axum-app-create`! This document 
 
 ### Prerequisites / 前置要求
 
-- Rust toolchain 1.75+ / Rust 工具链 1.75+
+- Rust toolchain 1.85+ / Rust 工具链 1.85+
 - Git / 版本控制
 - Basic knowledge of Axum web framework / Axum Web 框架基础知识
 

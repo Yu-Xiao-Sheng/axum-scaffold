@@ -282,7 +282,7 @@ fn get_current_year() -> String {
 
     // Fallback to chrono (which we use in the CLI)
     // This is hardcoded to avoid chrono dependency for just the year
-    "2025".to_string() // Update this when needed
+    "2026".to_string() // Update this when needed
 }
 
 #[cfg(test)]
