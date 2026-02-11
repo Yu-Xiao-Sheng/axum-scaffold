@@ -1,0 +1,21 @@
+{{#if has_biz_error}}
+//! Business error types
+//!
+//! Standardized error handling with i18n support.
+//! Error codes are defined in biz_errors.yaml at the workspace root.
+
+use thiserror::Error;
+
+/// Application error type
+#[derive(Debug, Error)]
+pub enum AppError {
+    #[error("Internal error: {0}")]
+    Internal(String),
+
+    #[error("Not found: {0}")]
+    NotFound(String),
+
+    #[error("Validation error: {0}")]
+    Validation(String),
+}
+{{/if}}

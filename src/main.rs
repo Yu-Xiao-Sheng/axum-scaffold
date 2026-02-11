@@ -3,9 +3,9 @@
 // This tool generates new Axum projects with sensible defaults and optional features.
 
 use axum_app_create::cli::{is_non_interactive, prompts::prompt_project_config};
-use axum_app_create::config::DatabaseOption;
+use axum_app_create::config::{DatabaseOption, Preset, ProjectMode};
 use axum_app_create::error::CliError;
-use axum_app_create::generator::project::{generate_project, get_success_message};
+use axum_app_create::generator::project::{generate_project, get_success_message_with_config};
 use axum_app_create::utils::rust_toolchain::check_rust_toolchain;
 use clap::Parser;
 use std::path::PathBuf;
@@ -14,7 +14,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(name = "axum-app-create")]
 #[command(about = "Scaffold a new Axum web application", long_about = None)]
-#[command(version = "0.1.1")]
+#[command(version = "0.2.0")]
 struct CliArgs {
     /// Project name (positional argument or --project-name)
     #[arg(value_name = "PROJECT_NAME")]
@@ -39,6 +39,18 @@ struct CliArgs {
     /// Default log level: trace, debug, info, warn, error
     #[arg(long, value_name = "LEVEL")]
     log_level: Option<String>,
+
+    /// Project mode: single (default) or workspace
+    #[arg(long, value_name = "MODE")]
+    mode: Option<String>,
+
+    /// Configuration preset: minimal, api, or fullstack
+    #[arg(long, value_name = "PRESET")]
+    preset: Option<String>,
+
+    /// Generate GitHub Actions CI/CD workflow
+    #[arg(long)]
+    ci: bool,
 
     /// Force overwrite if target directory exists
     #[arg(long)]
@@ -79,7 +91,7 @@ fn main() -> anyhow::Result<()> {
 
     let args = CliArgs::parse();
 
-    println!("\n🦀 axum-app-create CLI Tool v0.1.1");
+    println!("\n🦀 axum-app-create CLI Tool v0.2.0");
 
     // Check Rust toolchain
     if let Err(e) = check_rust_toolchain() {
@@ -97,6 +109,35 @@ fn main() -> anyhow::Result<()> {
             eprintln!(
                 "\n❌ Invalid database option: '{}'\n\
                  💡 Valid options: none, postgresql, sqlite, both",
+                other
+            );
+            std::process::exit(1);
+        }
+    });
+
+    // Parse mode from CLI flag
+    let cli_mode = args.mode.as_deref().map(|m| match m {
+        "single" => ProjectMode::Single,
+        "workspace" => ProjectMode::Workspace,
+        other => {
+            eprintln!(
+                "\n❌ 无效的模式 / Invalid mode: '{}'\n\
+                 💡 有效选项 / Valid options: single, workspace",
+                other
+            );
+            std::process::exit(1);
+        }
+    });
+
+    // Parse preset from CLI flag
+    let cli_preset = args.preset.as_deref().map(|p| match p {
+        "minimal" => Preset::Minimal,
+        "api" => Preset::Api,
+        "fullstack" => Preset::Fullstack,
+        other => {
+            eprintln!(
+                "\n❌ 无效的预设 / Invalid preset: '{}'\n\
+                 💡 有效选项 / Valid options: minimal, api, fullstack",
                 other
             );
             std::process::exit(1);
@@ -125,17 +166,19 @@ fn main() -> anyhow::Result<()> {
         biz_error: if args.biz_error { Some(true) } else { None },
         log_level: args.log_level,
         author: args.author,
+        mode: cli_mode,
+        preset: cli_preset,
+        ci: if args.ci { Some(true) } else { None },
     };
 
     // Get project configuration
-    let config =
-        match prompt_project_config(interactive, args.project_name, Some(cli_overrides)) {
-            Ok(cfg) => cfg,
-            Err(e) => {
-                eprintln!("\n❌ {}", e);
-                std::process::exit(1);
-            }
-        };
+    let config = match prompt_project_config(interactive, args.project_name, Some(cli_overrides)) {
+        Ok(cfg) => cfg,
+        Err(e) => {
+            eprintln!("\n❌ {}", e);
+            std::process::exit(1);
+        }
+    };
 
     // Determine project directory
     let project_dir = PathBuf::from(&config.project_name);
@@ -144,7 +187,7 @@ fn main() -> anyhow::Result<()> {
     match generate_project(&project_dir, &config, interactive, args.force) {
         Ok(()) => {
             // Print success message
-            let message = get_success_message(&project_dir, &config.project_name);
+            let message = get_success_message_with_config(&project_dir, &config);
             println!("{}", message);
         }
         Err(e) => {

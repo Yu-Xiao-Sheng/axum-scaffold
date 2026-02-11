@@ -1,0 +1,9 @@
+//! {{project_name}} API layer
+//!
+//! HTTP handlers, routes, and middleware.
+
+pub mod config;
+pub mod handlers;
+{{#if has_auth}}
+pub mod middleware;
+{{/if}}

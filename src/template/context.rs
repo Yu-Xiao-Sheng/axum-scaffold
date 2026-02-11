@@ -3,7 +3,7 @@
 // This module builds context data for template rendering.
 
 #[allow(unused_imports)]
-use crate::config::{DatabaseConfig, DatabaseOption, FeatureSet, ProjectConfig};
+use crate::config::{DatabaseConfig, DatabaseOption, FeatureSet, ProjectConfig, ProjectMode};
 use serde::Serialize;
 
 /// Template context data structure
@@ -48,6 +48,12 @@ pub struct TemplateContext {
 
     /// Business error configuration (if applicable)
     pub biz_error: Option<BizErrorContext>,
+
+    /// 是否为工作区模式 / Whether workspace mode
+    pub is_workspace: bool,
+
+    /// 是否生成 CI/CD / Whether CI/CD is enabled
+    pub has_ci: bool,
 }
 
 /// Feature flags for template conditionals
@@ -228,6 +234,8 @@ impl TemplateContext {
             authentication,
             logging,
             biz_error,
+            is_workspace: config.mode == ProjectMode::Workspace,
+            has_ci: config.ci,
         }
     }
 }
@@ -334,5 +342,57 @@ mod tests {
         assert!(ctx.features.has_postgresql);
         assert!(!ctx.features.has_sqlite);
         assert!(ctx.database.is_some());
+    }
+
+    #[test]
+    fn test_template_context_single_mode() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            mode: crate::config::ProjectMode::Single,
+            ci: false,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(!ctx.is_workspace);
+        assert!(!ctx.has_ci);
+    }
+
+    #[test]
+    fn test_template_context_workspace_mode() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            mode: crate::config::ProjectMode::Workspace,
+            ci: false,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(ctx.is_workspace);
+        assert!(!ctx.has_ci);
+    }
+
+    #[test]
+    fn test_template_context_ci_enabled() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            ci: true,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(ctx.has_ci);
+    }
+
+    #[test]
+    fn test_template_context_ci_disabled() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            ci: false,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(!ctx.has_ci);
     }
 }

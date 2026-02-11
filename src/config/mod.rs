@@ -46,8 +46,74 @@ impl std::fmt::Display for DatabaseOption {
     }
 }
 
+/// 项目模式 / Project generation mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum ProjectMode {
+    /// 单包模式（v0.1.1 行为）/ Single-package mode
+    #[default]
+    Single,
+    /// 工作区模式 / Cargo workspace mode
+    Workspace,
+}
+
+impl std::fmt::Display for ProjectMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Single => write!(f, "single"),
+            Self::Workspace => write!(f, "workspace"),
+        }
+    }
+}
+
+/// 配置预设 / Configuration preset
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Preset {
+    /// 最小配置 / Minimal - no optional features
+    Minimal,
+    /// API 开发 / API - PostgreSQL + auth + logging + biz-error
+    Api,
+    /// 全栈开发 / Fullstack - Both DBs + auth + logging + biz-error
+    Fullstack,
+}
+
+impl Preset {
+    /// 将预设转换为功能集 / Convert preset to FeatureSet
+    pub fn to_feature_set(&self) -> FeatureSet {
+        match self {
+            Self::Minimal => FeatureSet {
+                database: DatabaseOption::None,
+                authentication: false,
+                logging: true,
+                biz_error: false,
+            },
+            Self::Api => FeatureSet {
+                database: DatabaseOption::PostgreSQL,
+                authentication: true,
+                logging: true,
+                biz_error: true,
+            },
+            Self::Fullstack => FeatureSet {
+                database: DatabaseOption::Both,
+                authentication: true,
+                logging: true,
+                biz_error: true,
+            },
+        }
+    }
+}
+
+impl std::fmt::Display for Preset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Minimal => write!(f, "minimal"),
+            Self::Api => write!(f, "api"),
+            Self::Fullstack => write!(f, "fullstack"),
+        }
+    }
+}
+
 /// Feature set configuration
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct FeatureSet {
     /// Database support (none, postgresql, sqlite, or both)
     pub database: DatabaseOption,
@@ -186,6 +252,12 @@ pub struct ProjectConfig {
     pub logging: Option<LoggingConfig>,
     /// Business error handling configuration (if biz-error feature enabled)
     pub biz_error: Option<BizErrorConfig>,
+    /// 项目模式 / Project mode (single or workspace)
+    pub mode: ProjectMode,
+    /// 使用的预设 / Preset used (if any)
+    pub preset: Option<Preset>,
+    /// 是否生成 CI/CD 配置 / Whether to generate CI/CD config
+    pub ci: bool,
 }
 
 impl Default for ProjectConfig {
@@ -199,6 +271,89 @@ impl Default for ProjectConfig {
             authentication: None,
             logging: Some(LoggingConfig::default()),
             biz_error: None,
+            mode: ProjectMode::Single,
+            preset: None,
+            ci: false,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    // Helper: generate arbitrary Preset values for property testing
+    fn arb_preset() -> impl Strategy<Value = Preset> {
+        prop_oneof![
+            Just(Preset::Minimal),
+            Just(Preset::Api),
+            Just(Preset::Fullstack),
+        ]
+    }
+
+    // Property 1: 预设到功能集映射一致性 / Preset-to-FeatureSet idempotency
+    // For any Preset, calling to_feature_set() twice returns the same FeatureSet.
+    // Validates: Requirements 2.1, 2.2, 2.3
+    proptest! {
+        #[test]
+        fn prop_preset_to_feature_set_idempotent(preset in arb_preset()) {
+            let first = preset.to_feature_set();
+            let second = preset.to_feature_set();
+            prop_assert_eq!(first, second);
+        }
+    }
+
+    #[test]
+    fn test_project_mode_default_is_single() {
+        assert_eq!(ProjectMode::default(), ProjectMode::Single);
+    }
+
+    #[test]
+    fn test_project_mode_display() {
+        assert_eq!(ProjectMode::Single.to_string(), "single");
+        assert_eq!(ProjectMode::Workspace.to_string(), "workspace");
+    }
+
+    #[test]
+    fn test_preset_display() {
+        assert_eq!(Preset::Minimal.to_string(), "minimal");
+        assert_eq!(Preset::Api.to_string(), "api");
+        assert_eq!(Preset::Fullstack.to_string(), "fullstack");
+    }
+
+    #[test]
+    fn test_preset_minimal_feature_set() {
+        let fs = Preset::Minimal.to_feature_set();
+        assert_eq!(fs.database, DatabaseOption::None);
+        assert!(!fs.authentication);
+        assert!(fs.logging);
+        assert!(!fs.biz_error);
+    }
+
+    #[test]
+    fn test_preset_api_feature_set() {
+        let fs = Preset::Api.to_feature_set();
+        assert_eq!(fs.database, DatabaseOption::PostgreSQL);
+        assert!(fs.authentication);
+        assert!(fs.logging);
+        assert!(fs.biz_error);
+    }
+
+    #[test]
+    fn test_preset_fullstack_feature_set() {
+        let fs = Preset::Fullstack.to_feature_set();
+        assert_eq!(fs.database, DatabaseOption::Both);
+        assert!(fs.authentication);
+        assert!(fs.logging);
+        assert!(fs.biz_error);
+    }
+
+    #[test]
+    fn test_project_config_default() {
+        let config = ProjectConfig::default();
+        assert_eq!(config.mode, ProjectMode::Single);
+        assert!(config.preset.is_none());
+        assert!(!config.ci);
     }
 }

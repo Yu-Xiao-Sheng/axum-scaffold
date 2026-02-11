@@ -1,0 +1,12 @@
+[package]
+name = "{{project_name}}-common"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+{{#if has_biz_error}}
+biz-error = { version = "0.1", features = ["codegen"] }
+{{/if}}
