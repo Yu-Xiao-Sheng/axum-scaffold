@@ -206,7 +206,7 @@
     - 添加 v0.2.0 版本条目，列出三大新功能
     - _Requirements: N/A_
 
-- [x] 11. 最终检查点 / Final Checkpoint
+- [ ] 11. 最终检查点 / Final Checkpoint
   - 运行 `cargo check` 确保编译通过
   - 运行 `cargo test` 确保所有测试通过（包括新增测试）
   - 运行 `cargo clippy -- -D warnings` 确保无 lint 警告

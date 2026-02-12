@@ -882,3 +882,68 @@ fn test_workspace_full_features_compiles() {
         "Workspace full-featured project failed to compile"
     );
 }
+
+/// Test workspace_crates context is correctly populated for workspace mode
+#[test]
+fn test_workspace_crates_context() {
+    use axum_app_create::template::context::TemplateContext;
+
+    let config = ProjectConfig {
+        project_name: "ctx-test".to_string(),
+        mode: ProjectMode::Workspace,
+        ..Default::default()
+    };
+
+    let ctx = TemplateContext::from_config(&config);
+    assert!(ctx.is_workspace);
+    let crates = ctx
+        .workspace_crates
+        .as_ref()
+        .expect("workspace_crates should be Some");
+    assert_eq!(crates.len(), 4);
+
+    // Verify crate names
+    let names: Vec<&str> = crates.iter().map(|c| c.name.as_str()).collect();
+    assert_eq!(names, vec!["api", "domain", "infrastructure", "common"]);
+
+    // Verify api is bin, others are lib
+    assert_eq!(crates[0].kind, "bin");
+    assert_eq!(crates[1].kind, "lib");
+    assert_eq!(crates[2].kind, "lib");
+    assert_eq!(crates[3].kind, "lib");
+
+    // Verify package names
+    assert_eq!(crates[0].package_name, "ctx-test-api");
+    assert_eq!(crates[1].package_name, "ctx-test-domain");
+
+    // Verify api depends on domain, infrastructure, common
+    assert!(crates[0].workspace_deps.contains(&"domain".to_string()));
+    assert!(
+        crates[0]
+            .workspace_deps
+            .contains(&"infrastructure".to_string())
+    );
+    assert!(crates[0].workspace_deps.contains(&"common".to_string()));
+
+    // Verify domain has no workspace deps
+    assert!(crates[1].workspace_deps.is_empty());
+
+    // Verify infrastructure depends on domain
+    assert_eq!(crates[2].workspace_deps, vec!["domain"]);
+}
+
+/// Test workspace_crates is None for single mode
+#[test]
+fn test_single_mode_no_workspace_crates() {
+    use axum_app_create::template::context::TemplateContext;
+
+    let config = ProjectConfig {
+        project_name: "single-test".to_string(),
+        mode: ProjectMode::Single,
+        ..Default::default()
+    };
+
+    let ctx = TemplateContext::from_config(&config);
+    assert!(!ctx.is_workspace);
+    assert!(ctx.workspace_crates.is_none());
+}
