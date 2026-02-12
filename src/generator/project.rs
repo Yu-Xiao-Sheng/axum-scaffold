@@ -167,6 +167,26 @@ pub fn generate_project(
         }
     }
 
+    // Verify workspace Cargo.toml files (Requirement 5.5)
+    if config.mode == ProjectMode::Workspace {
+        let required_files = [
+            "Cargo.toml",
+            "api/Cargo.toml",
+            "domain/Cargo.toml",
+            "infrastructure/Cargo.toml",
+            "common/Cargo.toml",
+        ];
+        for file in &required_files {
+            if !project_dir.join(file).exists() {
+                return Err(CliError::Generation(format!(
+                    "❌ 工作区验证失败 / Workspace verification failed: 缺少文件 / Missing file: {}",
+                    file
+                )));
+            }
+        }
+        println!("  ✓ Workspace structure verified");
+    }
+
     Ok(())
 }
 
