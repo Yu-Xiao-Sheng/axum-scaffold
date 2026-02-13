@@ -1,0 +1,64 @@
+{{#if has_auth}}
+use axum::{
+    http::StatusCode,
+    response::IntoResponse,
+    Json,
+    routing::post,
+    Router,
+};
+use serde::{Deserialize, Serialize};
+
+/// Login request
+#[derive(Debug, Deserialize)]
+pub struct LoginRequest {
+    pub username: String,
+    pub password: String,
+}
+
+/// Register request
+#[derive(Debug, Deserialize)]
+pub struct RegisterRequest {
+    pub username: String,
+    pub email: String,
+    pub password: String,
+}
+
+/// Auth response
+#[derive(Debug, Serialize)]
+pub struct AuthResponse {
+    pub token: String,
+    pub username: String,
+}
+
+/// Handler: POST /auth/login
+pub async fn login(
+    Json(req): Json<LoginRequest>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let _password = req.password;
+    let response = AuthResponse {
+        token: "placeholder_jwt_token".to_string(),
+        username: req.username,
+    };
+    Ok(Json(response))
+}
+
+/// Handler: POST /auth/register
+pub async fn register(
+    Json(req): Json<RegisterRequest>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let _password = req.password;
+    let _email = req.email;
+    let response = AuthResponse {
+        token: "placeholder_jwt_token".to_string(),
+        username: req.username,
+    };
+    Ok(Json(response))
+}
+
+/// Router for authentication routes
+pub fn router() -> Router {
+    Router::new()
+        .route("/auth/login", post(login))
+        .route("/auth/register", post(register))
+}
+{{/if}}

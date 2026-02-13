@@ -3,7 +3,7 @@
 // This module builds context data for template rendering.
 
 #[allow(unused_imports)]
-use crate::config::{DatabaseConfig, DatabaseOption, FeatureSet, ProjectConfig};
+use crate::config::{DatabaseConfig, DatabaseOption, FeatureSet, ProjectConfig, ProjectMode};
 use serde::Serialize;
 
 /// Template context data structure
@@ -48,6 +48,28 @@ pub struct TemplateContext {
 
     /// Business error configuration (if applicable)
     pub biz_error: Option<BizErrorContext>,
+
+    /// 是否为工作区模式 / Whether workspace mode
+    pub is_workspace: bool,
+
+    /// 是否生成 CI/CD / Whether CI/CD is enabled
+    pub has_ci: bool,
+
+    /// 工作区子 crate 信息 / Workspace crate metadata (None if single mode)
+    pub workspace_crates: Option<Vec<WorkspaceCrateInfo>>,
+}
+
+/// 工作区子 crate 信息 / Workspace crate metadata
+#[derive(Debug, Clone, Serialize)]
+pub struct WorkspaceCrateInfo {
+    /// crate 名称 / Crate name (e.g. "api")
+    pub name: String,
+    /// 完整包名 / Full package name (e.g. "my-app-api")
+    pub package_name: String,
+    /// crate 类型 / Crate kind: "bin" or "lib"
+    pub kind: String,
+    /// 依赖的其他 workspace crate / Dependencies on other workspace crates
+    pub workspace_deps: Vec<String>,
 }
 
 /// Feature flags for template conditionals
@@ -228,6 +250,43 @@ impl TemplateContext {
             authentication,
             logging,
             biz_error,
+            is_workspace: config.mode == ProjectMode::Workspace,
+            has_ci: config.ci,
+            workspace_crates: if config.mode == ProjectMode::Workspace {
+                let project = &config.project_name;
+                Some(vec![
+                    WorkspaceCrateInfo {
+                        name: "api".to_string(),
+                        package_name: format!("{}-api", project),
+                        kind: "bin".to_string(),
+                        workspace_deps: vec![
+                            "domain".to_string(),
+                            "infrastructure".to_string(),
+                            "common".to_string(),
+                        ],
+                    },
+                    WorkspaceCrateInfo {
+                        name: "domain".to_string(),
+                        package_name: format!("{}-domain", project),
+                        kind: "lib".to_string(),
+                        workspace_deps: vec![],
+                    },
+                    WorkspaceCrateInfo {
+                        name: "infrastructure".to_string(),
+                        package_name: format!("{}-infrastructure", project),
+                        kind: "lib".to_string(),
+                        workspace_deps: vec!["domain".to_string()],
+                    },
+                    WorkspaceCrateInfo {
+                        name: "common".to_string(),
+                        package_name: format!("{}-common", project),
+                        kind: "lib".to_string(),
+                        workspace_deps: vec![],
+                    },
+                ])
+            } else {
+                None
+            },
         }
     }
 }
@@ -334,5 +393,113 @@ mod tests {
         assert!(ctx.features.has_postgresql);
         assert!(!ctx.features.has_sqlite);
         assert!(ctx.database.is_some());
+    }
+
+    #[test]
+    fn test_template_context_single_mode() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            mode: crate::config::ProjectMode::Single,
+            ci: false,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(!ctx.is_workspace);
+        assert!(!ctx.has_ci);
+    }
+
+    #[test]
+    fn test_template_context_workspace_mode() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            mode: crate::config::ProjectMode::Workspace,
+            ci: false,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(ctx.is_workspace);
+        assert!(!ctx.has_ci);
+    }
+
+    #[test]
+    fn test_template_context_ci_enabled() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            ci: true,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(ctx.has_ci);
+    }
+
+    #[test]
+    fn test_template_context_ci_disabled() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            ci: false,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(!ctx.has_ci);
+    }
+
+    #[test]
+    fn test_template_context_workspace_crates_single_mode() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            mode: crate::config::ProjectMode::Single,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        assert!(ctx.workspace_crates.is_none());
+    }
+
+    #[test]
+    fn test_template_context_workspace_crates_workspace_mode() {
+        let config = ProjectConfig {
+            project_name: "my-app".to_string(),
+            mode: crate::config::ProjectMode::Workspace,
+            ..Default::default()
+        };
+
+        let ctx = TemplateContext::from_config(&config);
+        let crates = ctx.workspace_crates.unwrap();
+        assert_eq!(crates.len(), 4);
+
+        // api crate
+        let api = &crates[0];
+        assert_eq!(api.name, "api");
+        assert_eq!(api.package_name, "my-app-api");
+        assert_eq!(api.kind, "bin");
+        assert_eq!(
+            api.workspace_deps,
+            vec!["domain", "infrastructure", "common"]
+        );
+
+        // domain crate
+        let domain = &crates[1];
+        assert_eq!(domain.name, "domain");
+        assert_eq!(domain.package_name, "my-app-domain");
+        assert_eq!(domain.kind, "lib");
+        assert!(domain.workspace_deps.is_empty());
+
+        // infrastructure crate
+        let infra = &crates[2];
+        assert_eq!(infra.name, "infrastructure");
+        assert_eq!(infra.package_name, "my-app-infrastructure");
+        assert_eq!(infra.kind, "lib");
+        assert_eq!(infra.workspace_deps, vec!["domain"]);
+
+        // common crate
+        let common = &crates[3];
+        assert_eq!(common.name, "common");
+        assert_eq!(common.package_name, "my-app-common");
+        assert_eq!(common.kind, "lib");
+        assert!(common.workspace_deps.is_empty());
     }
 }

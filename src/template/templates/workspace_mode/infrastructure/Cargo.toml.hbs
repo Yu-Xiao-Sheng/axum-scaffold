@@ -1,0 +1,13 @@
+[package]
+name = "{{project_name}}-infrastructure"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+{{project_name}}-domain = { path = "../domain" }
+
+anyhow = "1"
+{{#if has_database}}
+sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "postgres", "sqlite"] }
+{{/if}}

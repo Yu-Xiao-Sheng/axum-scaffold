@@ -1,0 +1,27 @@
+[package]
+name = "{{project_name}}-api"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "{{project_name}}"
+path = "src/main.rs"
+
+[dependencies]
+{{project_name}}-domain = { path = "../domain" }
+{{project_name}}-infrastructure = { path = "../infrastructure" }
+{{project_name}}-common = { path = "../common" }
+
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+
+{{#if has_auth}}
+jsonwebtoken = "10"
+bcrypt = "0.18"
+{{/if}}

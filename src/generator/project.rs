@@ -3,10 +3,13 @@
 // This module handles the main project generation logic.
 
 use crate::config::ProjectConfig;
+use crate::config::ProjectMode;
 use crate::error::{CliError, Result};
 use crate::template::context::TemplateContext;
 use crate::template::engine::TemplateEngine;
-use crate::template::templates::get_single_mode_templates;
+use crate::template::templates::{
+    get_ci_templates, get_single_mode_templates, get_workspace_mode_templates,
+};
 use std::path::Path;
 
 /// Generate a new project with the given configuration
@@ -68,8 +71,7 @@ pub fn generate_project(
                 "重命名 / Rename - Keep existing directory, use different name",
             ];
 
-            let ans =
-                inquire::Select::new("请选择操作 / Choose an action:", options).prompt()?;
+            let ans = inquire::Select::new("请选择操作 / Choose an action:", options).prompt()?;
 
             match ans {
                 "覆盖 / Overwrite - Delete existing directory and regenerate" => {
@@ -117,8 +119,16 @@ pub fn generate_project(
     // Create template engine
     let engine = TemplateEngine::new();
 
-    // Get templates
-    let templates = get_single_mode_templates();
+    // Select templates based on project mode
+    let mut templates = match config.mode {
+        ProjectMode::Single => get_single_mode_templates(),
+        ProjectMode::Workspace => get_workspace_mode_templates(),
+    };
+
+    // Append CI templates if enabled
+    if config.ci {
+        templates.extend(get_ci_templates());
+    }
 
     // Render and write each template
     println!("\n📝 Generating files:");
@@ -155,6 +165,26 @@ pub fn generate_project(
         _ => {
             println!("  ⚠ Could not update dependencies, run `cargo update` manually");
         }
+    }
+
+    // Verify workspace Cargo.toml files (Requirement 5.5)
+    if config.mode == ProjectMode::Workspace {
+        let required_files = [
+            "Cargo.toml",
+            "api/Cargo.toml",
+            "domain/Cargo.toml",
+            "infrastructure/Cargo.toml",
+            "common/Cargo.toml",
+        ];
+        for file in &required_files {
+            if !project_dir.join(file).exists() {
+                return Err(CliError::Generation(format!(
+                    "❌ 工作区验证失败 / Workspace verification failed: 缺少文件 / Missing file: {}",
+                    file
+                )));
+            }
+        }
+        println!("  ✓ Workspace structure verified");
     }
 
     Ok(())
@@ -296,6 +326,67 @@ Happy hacking! 🦀
         project_dir.display(),
         generation_time,
         project_name,
+        project_name
+    )
+}
+
+/// Get success message for workspace mode project generation
+pub fn get_success_message_with_config(project_dir: &Path, config: &ProjectConfig) -> String {
+    use chrono::Utc;
+
+    let generation_time = Utc::now().format("%Y-%m-%d %H:%M:%S UTC");
+    let project_name = &config.project_name;
+
+    let mode_info = match config.mode {
+        ProjectMode::Workspace => "\n📦 Mode:         Workspace (multi-crate)\n\
+             📁 Crates:       api, domain, infrastructure, common"
+            .to_string(),
+        ProjectMode::Single => "\n📦 Mode:         Single package".to_string(),
+    };
+
+    let ci_info = if config.ci {
+        "\n🔄 CI/CD:        GitHub Actions workflow generated (.github/workflows/ci.yml)"
+    } else {
+        ""
+    };
+
+    format!(
+        r#"
+✨ ══════════════════════════════════════════════════════ ✓
+✨                                                        ✨
+✨  Project '{}' created successfully!                      ✨
+✨                                                        ✨
+✨ ══════════════════════════════════════════════════════ ✓
+
+📂 Location:     {}
+🕐 Generated:    {}{}{}
+
+═════════════════════════════════════════════════════════
+
+🚀 Quick Start:
+
+  $ cd {}
+  $ cargo run
+
+═════════════════════════════════════════════════════════
+
+🧪 Test your API:
+
+  # Health check
+  $ curl http://127.0.0.1:8080/health
+
+  # Expected response: {{"status":"ok"}}
+
+═════════════════════════════════════════════════════════
+
+Happy hacking! 🦀
+
+"#,
+        project_name,
+        project_dir.display(),
+        generation_time,
+        mode_info,
+        ci_info,
         project_name
     )
 }

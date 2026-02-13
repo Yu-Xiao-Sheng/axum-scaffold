@@ -1,0 +1,20 @@
+//! Domain traits
+//!
+//! Define repository and service traits here.
+//! Implementations live in the infrastructure crate.
+
+use crate::entities::ExampleEntity;
+
+/// Example repository trait - implement in infrastructure crate
+pub trait ExampleRepository: Send + Sync {
+    /// Find entity by ID
+    fn find_by_id(&self, id: &str) -> Result<Option<ExampleEntity>, Box<dyn std::error::Error>>;
+}
+{{#if has_auth}}
+
+/// Authentication trait - implement in infrastructure crate
+pub trait AuthService: Send + Sync {
+    /// Verify user credentials
+    fn verify_credentials(&self, username: &str, password: &str) -> Result<bool, Box<dyn std::error::Error>>;
+}
+{{/if}}

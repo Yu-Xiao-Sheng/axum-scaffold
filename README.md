@@ -32,6 +32,9 @@
 ### Core Features / 核心功能
 
 - ✅ **Single Project Mode / 单项目模式**: Generate single-package Axum applications / 生成单包 Axum 应用
+- ✅ **Workspace Mode / 工作区模式**: Generate multi-crate workspace projects (Clean Architecture) / 生成多 crate 工作区项目（分层架构）
+- ✅ **Configuration Presets / 配置预设**: Quick setup with `--preset minimal/api/fullstack` / 使用预设快速配置
+- ✅ **CI/CD Integration / CI/CD 集成**: Generate GitHub Actions workflow with `--ci` / 生成 GitHub Actions 工作流
 - ✅ **Interactive Prompts / 交互式提示**: Friendly CLI with interactive configuration / 友好的交互式配置界面
 - ✅ **Sensible Defaults / 合理默认值**: Works out of the box with zero configuration / 开箱即用，零配置
 - ✅ **Production-Ready Templates / 生产就绪模板**: Includes tracing, error handling, proper structure / 包含日志、错误处理、规范结构
@@ -117,6 +120,27 @@ cd my-app
 cargo run
 ```
 
+### Workspace Mode / 工作区模式
+
+```bash
+axum-app-create my-app --mode workspace --preset fullstack --ci
+cd my-app
+cargo run
+```
+
+### Using Presets / 使用预设
+
+```bash
+# Minimal - no optional features / 最小配置
+axum-app-create my-app --preset minimal
+
+# API - PostgreSQL + Auth + Biz-error / API 开发
+axum-app-create my-app --preset api
+
+# Fullstack - Both DBs + all features / 全栈开发
+axum-app-create my-app --preset fullstack
+```
+
 ### Minimal Project / 最小项目
 
 ```bash
@@ -150,10 +174,13 @@ axum-app-create [OPTIONS] [PROJECT_NAME]
 | Flag / 标志 | Description / 描述 | Default / 默认值 |
 |-------------|-------------------|------------------|
 | `[PROJECT_NAME]` | Project name (positional argument) / 项目名称（位置参数） | Prompted / 提示输入 |
+| `--mode <MODE>` | Project mode: `single`, `workspace` / 项目模式 | `single` |
+| `--preset <PRESET>` | Preset: `minimal`, `api`, `fullstack` / 配置预设 | Prompted / 提示输入 |
 | `--database <TYPE>` | Database: `none`, `postgresql`, `sqlite`, `both` / 数据库类型 | Prompted / 提示输入 |
 | `--auth` | Enable JWT authentication / 启用 JWT 认证 | Prompted / 提示输入 |
 | `--biz-error` | Enable business error handling / 启用业务错误处理 | Prompted / 提示输入 |
 | `--log-level <LEVEL>` | Logging: `trace`, `debug`, `info`, `warn`, `error` / 日志级别 | Prompted / 提示输入 |
+| `--ci` | Generate GitHub Actions CI workflow / 生成 CI 工作流 | `false` |
 | `--author <NAME>` | Author name for generated project / 项目作者名称 | Git config / Git 配置 |
 | `--force` | Force overwrite if target directory exists / 强制覆盖已存在的目录 | `false` |
 | `--non-interactive` | Disable prompts / 禁用交互提示 (fail if required values missing / 缺少必需值时失败) | `false` |
@@ -178,12 +205,19 @@ axum-app-create myapp --non-interactive
 # Force overwrite existing project / 强制覆盖已存在的项目
 axum-app-create myapp --force
 
+# Using presets / 使用预设
+axum-app-create myapp --preset api
+axum-app-create myapp --preset fullstack --ci
+
+# Workspace mode / 工作区模式
+axum-app-create myapp --mode workspace
+axum-app-create myapp --mode workspace --preset api --ci
+
 # Full featured / 完整功能
 axum-app-create myapp \
-  --database both \
-  --auth \
-  --biz-error \
-  --log-level info \
+  --mode workspace \
+  --preset fullstack \
+  --ci \
   --author "Your Name"
 ```
 
@@ -424,20 +458,20 @@ https://github.com/Yu-Xiao-Sheng/axum-app-create/issues
 - [x] Integration tests / 集成测试
 - [x] Bilingual documentation (English + Chinese) / 双语文档（英文+中文）
 
-### Phase 2: Enhanced Features 🚧 (Planned / 计划中)
+### Phase 2: Enhanced Features ✅ (Complete / 已完成)
 
-- [ ] Workspace mode (multi-package projects) / 工作区模式（多包项目）
+- [x] Workspace mode (multi-package projects) / 工作区模式（多包项目）
+- [x] Interactive configuration presets / 交互式配置预设
+- [x] CI/CD integration (GitHub Actions) / CI/CD 集成（GitHub Actions）
 - [ ] Custom template system / 自定义模板系统
 - [ ] Template inheritance / 模板继承
-- [ ] Interactive configuration presets / 交互式配置预设
 - [ ] Project update mechanism / 项目更新机制
 
 ### Phase 3: Ecosystem Integration 🔮 (Future / 未来)
 
 - [ ] Plugin system / 插件系统
 - [ ] Template marketplace / 模板市场
-- [ ] CI/CD integration (GitHub Actions, GitLab CI) / CI/CD 集成
-- [ ] Docker generation / Docker 生成
+- [ ] GitLab CI integration / GitLab CI 集成
 - [ ] Deployment helpers / 部署助手
 
 See [issues](https://github.com/Yu-Xiao-Sheng/axum-app-create/issues) for detailed progress and to suggest features.
@@ -525,9 +559,9 @@ Built with great open-source tools:
 
 ---
 
-**Current Version / 当前版本**: 0.1.1
+**Current Version / 当前版本**: 0.2.0
 
-**Status / 状态**: Phase 1 MVP Complete / Phase 1 MVP 已完成 ✅
+**Status / 状态**: Phase 2 Enhanced Features Complete / Phase 2 增强功能已完成 ✅
 
 **Year / 年份**: 2026
 

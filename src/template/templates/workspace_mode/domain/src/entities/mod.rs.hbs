@@ -1,0 +1,12 @@
+//! Domain entities
+//!
+//! Define your business entities here.
+
+use serde::{Deserialize, Serialize};
+
+/// Example entity - replace with your domain models
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExampleEntity {
+    pub id: String,
+    pub name: String,
+}

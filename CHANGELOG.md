@@ -13,11 +13,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned / 计划中
-- Workspace mode for multi-package projects / 多包项目的工作区模式
 - Custom template system / 自定义模板系统
 - Template inheritance / 模板继承
-- Interactive configuration presets / 交互式配置预设
 - Project update mechanism / 项目更新机制
+- Plugin system / 插件系统
+
+---
+
+## [0.2.0] - 2026-02-11
+
+### Added / 新增
+
+#### Workspace Mode / 工作区模式
+- Multi-crate workspace project generation (Clean Architecture) / 多 crate 工作区项目生成（分层架构）
+- Four-crate structure: `api`, `domain`, `infrastructure`, `common` / 四 crate 结构
+- `--mode workspace` CLI flag / `--mode workspace` 命令行标志
+- Workspace-aware Dockerfile with multi-stage build / 适配工作区的多阶段构建 Dockerfile
+- Workspace README with architecture overview / 包含架构概览的工作区 README
+
+#### Configuration Presets / 配置预设
+- `--preset minimal` — no optional features / 无可选功能
+- `--preset api` — PostgreSQL + Auth + Biz-error / PostgreSQL + 认证 + 业务错误
+- `--preset fullstack` — Both databases + all features / 双数据库 + 全部功能
+- Preset resolution priority: individual CLI flags > preset > interactive prompt > defaults / 预设解析优先级：单独 CLI 标志 > 预设值 > 交互式提示 > 默认值
+
+#### CI/CD Integration / CI/CD 集成
+- `--ci` flag to generate GitHub Actions workflow / `--ci` 标志生成 GitHub Actions 工作流
+- CI workflow with 4 jobs: check, test, fmt, clippy / 包含 4 个 job 的 CI 工作流
+- Workspace-aware CI (`--workspace` flag auto-applied) / 工作区感知的 CI（自动应用 `--workspace` 标志）
+- Rust toolchain caching with `Swatinem/rust-cache@v2` / 使用 rust-cache 缓存工具链
+
+#### Testing / 测试
+- 12 new integration tests for workspace mode, presets, and CI / 12 个新集成测试
+- Property-based tests with `proptest` for preset mapping and override logic / 使用 proptest 的属性测试
+- Compile verification tests for generated workspace projects / 生成工作区项目的编译验证测试
+
+### Changed / 更改
+- Version bumped to 0.2.0 / 版本升级到 0.2.0
+- Interactive prompts now include mode, preset, and CI selection / 交互式提示现在包含模式、预设和 CI 选择
+- Template context extended with `is_workspace` and `has_ci` fields / 模板上下文扩展了 `is_workspace` 和 `has_ci` 字段
+- Generator flow updated to select templates by project mode / 生成器流程更新为按项目模式选择模板
 
 ---
 

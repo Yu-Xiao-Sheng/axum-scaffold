@@ -2,7 +2,7 @@
 //
 // These tests verify the end-to-end functionality of the CLI tool
 
-use axum_app_create::config::ProjectConfig;
+use axum_app_create::config::{Preset, ProjectConfig, ProjectMode};
 use axum_app_create::generator::project::generate_project;
 use std::process::Command;
 use tempfile::TempDir;
@@ -397,7 +397,10 @@ fn test_existing_dir_no_force_fails() {
 
     // Generate again without force should fail
     let result = generate_project(&project_dir, &config, false, false);
-    assert!(result.is_err(), "Should fail when directory exists without --force");
+    assert!(
+        result.is_err(),
+        "Should fail when directory exists without --force"
+    );
 }
 
 /// Test: project with ALL features enabled compiles with `cargo check`
@@ -496,4 +499,451 @@ fn test_database_auth_project_compiles() {
         output.status.success(),
         "Database+Auth generated project failed to compile"
     );
+}
+
+// ============================================================
+// v0.2.0 Integration Tests
+// ============================================================
+
+/// Test workspace mode generates correct structure
+#[test]
+fn test_workspace_mode_basic_structure() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ws-app");
+
+    let config = ProjectConfig {
+        project_name: "ws-app".to_string(),
+        mode: ProjectMode::Workspace,
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(
+        result.is_ok(),
+        "Workspace generation failed: {:?}",
+        result.err()
+    );
+
+    // Verify root Cargo.toml has [workspace]
+    let cargo_content = std::fs::read_to_string(project_dir.join("Cargo.toml")).unwrap();
+    assert!(
+        cargo_content.contains("[workspace]"),
+        "Root Cargo.toml missing [workspace]"
+    );
+    assert!(
+        cargo_content.contains("members"),
+        "Root Cargo.toml missing members"
+    );
+
+    // Verify all 4 sub-crate directories exist
+    for crate_name in &["api", "domain", "infrastructure", "common"] {
+        assert!(
+            project_dir.join(crate_name).exists(),
+            "Missing crate dir: {}",
+            crate_name
+        );
+        assert!(
+            project_dir
+                .join(format!("{}/Cargo.toml", crate_name))
+                .exists(),
+            "Missing {}/Cargo.toml",
+            crate_name
+        );
+        assert!(
+            project_dir
+                .join(format!("{}/src/lib.rs", crate_name))
+                .exists(),
+            "Missing {}/src/lib.rs",
+            crate_name
+        );
+    }
+
+    // Verify api crate has main.rs (binary crate)
+    assert!(
+        project_dir.join("api/src/main.rs").exists(),
+        "Missing api/src/main.rs"
+    );
+}
+
+/// Test workspace mode + database feature
+#[test]
+fn test_workspace_mode_with_database() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ws-db-app");
+
+    let config = ProjectConfig {
+        project_name: "ws-db-app".to_string(),
+        mode: ProjectMode::Workspace,
+        features: axum_app_create::config::FeatureSet {
+            database: axum_app_create::config::DatabaseOption::PostgreSQL,
+            ..Default::default()
+        },
+        database: Some(axum_app_create::config::DatabaseConfig::default()),
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    assert!(
+        project_dir.join("infrastructure/src/db.rs").exists(),
+        "Missing infrastructure/src/db.rs"
+    );
+}
+
+/// Test workspace mode + auth feature
+#[test]
+fn test_workspace_mode_with_auth() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ws-auth-app");
+
+    let config = ProjectConfig {
+        project_name: "ws-auth-app".to_string(),
+        mode: ProjectMode::Workspace,
+        features: axum_app_create::config::FeatureSet {
+            authentication: true,
+            ..Default::default()
+        },
+        authentication: Some(axum_app_create::config::AuthConfig::default()),
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    assert!(
+        project_dir.join("api/src/handlers/auth.rs").exists(),
+        "Missing api/src/handlers/auth.rs"
+    );
+    assert!(
+        project_dir.join("api/src/middleware/mod.rs").exists(),
+        "Missing api/src/middleware/mod.rs"
+    );
+}
+
+/// Test workspace mode + biz-error feature
+#[test]
+fn test_workspace_mode_with_biz_error() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ws-biz-app");
+
+    let config = ProjectConfig {
+        project_name: "ws-biz-app".to_string(),
+        mode: ProjectMode::Workspace,
+        features: axum_app_create::config::FeatureSet {
+            biz_error: true,
+            ..Default::default()
+        },
+        biz_error: Some(axum_app_create::config::BizErrorConfig::default()),
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    assert!(
+        project_dir.join("common/src/error.rs").exists(),
+        "Missing common/src/error.rs"
+    );
+}
+
+/// Test preset minimal generates no optional features
+#[test]
+fn test_preset_minimal() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("minimal-app");
+
+    let features = Preset::Minimal.to_feature_set();
+    let config = ProjectConfig {
+        project_name: "minimal-app".to_string(),
+        features,
+        preset: Some(Preset::Minimal),
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    // No database or auth files should exist (they render to empty)
+    let db_content = std::fs::read_to_string(project_dir.join("src/db.rs")).unwrap_or_default();
+    assert!(db_content.trim().is_empty() || !project_dir.join("src/db.rs").exists());
+}
+
+/// Test preset api generates PostgreSQL + auth + biz-error
+#[test]
+fn test_preset_api() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("api-app");
+
+    let features = Preset::Api.to_feature_set();
+    let config = ProjectConfig {
+        project_name: "api-app".to_string(),
+        features,
+        preset: Some(Preset::Api),
+        database: Some(axum_app_create::config::DatabaseConfig::default()),
+        authentication: Some(axum_app_create::config::AuthConfig::default()),
+        biz_error: Some(axum_app_create::config::BizErrorConfig::default()),
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    // Auth file should have content
+    let auth_content = std::fs::read_to_string(project_dir.join("src/handlers/auth.rs")).unwrap();
+    assert!(
+        !auth_content.trim().is_empty(),
+        "Auth handler should have content"
+    );
+}
+
+/// Test preset fullstack generates both DBs + all features
+#[test]
+fn test_preset_fullstack() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("fullstack-app");
+
+    let features = Preset::Fullstack.to_feature_set();
+    let config = ProjectConfig {
+        project_name: "fullstack-app".to_string(),
+        features,
+        preset: Some(Preset::Fullstack),
+        database: Some(axum_app_create::config::DatabaseConfig::default()),
+        authentication: Some(axum_app_create::config::AuthConfig::default()),
+        biz_error: Some(axum_app_create::config::BizErrorConfig::default()),
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    let cargo_content = std::fs::read_to_string(project_dir.join("Cargo.toml")).unwrap();
+    assert!(
+        cargo_content.contains("sqlx"),
+        "Fullstack should include sqlx"
+    );
+}
+
+/// Test CI template generated when ci=true
+#[test]
+fn test_ci_enabled() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ci-app");
+
+    let config = ProjectConfig {
+        project_name: "ci-app".to_string(),
+        ci: true,
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    assert!(
+        project_dir.join(".github/workflows/ci.yml").exists(),
+        "CI workflow file should exist"
+    );
+
+    // Single mode should NOT have --workspace flag
+    let ci_content = std::fs::read_to_string(project_dir.join(".github/workflows/ci.yml")).unwrap();
+    assert!(
+        !ci_content.contains("--workspace"),
+        "Single mode CI should not have --workspace"
+    );
+}
+
+/// Test CI template NOT generated when ci=false
+#[test]
+fn test_ci_disabled() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("no-ci-app");
+
+    let config = ProjectConfig {
+        project_name: "no-ci-app".to_string(),
+        ci: false,
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    assert!(
+        !project_dir.join(".github/workflows/ci.yml").exists(),
+        "CI workflow should NOT exist"
+    );
+}
+
+/// Test workspace mode + CI has --workspace flag
+#[test]
+fn test_workspace_ci_has_workspace_flag() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ws-ci-app");
+
+    let config = ProjectConfig {
+        project_name: "ws-ci-app".to_string(),
+        mode: ProjectMode::Workspace,
+        ci: true,
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    let ci_content = std::fs::read_to_string(project_dir.join(".github/workflows/ci.yml")).unwrap();
+    assert!(
+        ci_content.contains("--workspace"),
+        "Workspace CI should have --workspace flag"
+    );
+}
+
+/// Test workspace mode basic project compiles with cargo check
+#[test]
+fn test_workspace_basic_compiles() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ws-compile-test");
+
+    let config = ProjectConfig {
+        project_name: "ws-compile-test".to_string(),
+        mode: ProjectMode::Workspace,
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    let output = Command::new("cargo")
+        .arg("check")
+        .arg("--workspace")
+        .arg("--manifest-path")
+        .arg(project_dir.join("Cargo.toml"))
+        .output()
+        .expect("Failed to run cargo check");
+
+    if !output.status.success() {
+        eprintln!(
+            "cargo check stdout: {}",
+            String::from_utf8_lossy(&output.stdout)
+        );
+        eprintln!(
+            "cargo check stderr: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    assert!(
+        output.status.success(),
+        "Workspace project failed to compile"
+    );
+}
+
+/// Test workspace mode full-featured project compiles
+#[test]
+fn test_workspace_full_features_compiles() {
+    let temp_dir = TempDir::new().unwrap();
+    let project_dir = temp_dir.path().join("ws-full-test");
+
+    let features = Preset::Fullstack.to_feature_set();
+    let config = ProjectConfig {
+        project_name: "ws-full-test".to_string(),
+        mode: ProjectMode::Workspace,
+        features,
+        preset: Some(Preset::Fullstack),
+        database: Some(axum_app_create::config::DatabaseConfig::default()),
+        authentication: Some(axum_app_create::config::AuthConfig::default()),
+        biz_error: Some(axum_app_create::config::BizErrorConfig::default()),
+        ci: true,
+        ..Default::default()
+    };
+
+    let result = generate_project(&project_dir, &config, false, false);
+    assert!(result.is_ok(), "Generation failed: {:?}", result.err());
+
+    let output = Command::new("cargo")
+        .arg("check")
+        .arg("--workspace")
+        .arg("--manifest-path")
+        .arg(project_dir.join("Cargo.toml"))
+        .output()
+        .expect("Failed to run cargo check");
+
+    if !output.status.success() {
+        eprintln!(
+            "cargo check stdout: {}",
+            String::from_utf8_lossy(&output.stdout)
+        );
+        eprintln!(
+            "cargo check stderr: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    assert!(
+        output.status.success(),
+        "Workspace full-featured project failed to compile"
+    );
+}
+
+/// Test workspace_crates context is correctly populated for workspace mode
+#[test]
+fn test_workspace_crates_context() {
+    use axum_app_create::template::context::TemplateContext;
+
+    let config = ProjectConfig {
+        project_name: "ctx-test".to_string(),
+        mode: ProjectMode::Workspace,
+        ..Default::default()
+    };
+
+    let ctx = TemplateContext::from_config(&config);
+    assert!(ctx.is_workspace);
+    let crates = ctx
+        .workspace_crates
+        .as_ref()
+        .expect("workspace_crates should be Some");
+    assert_eq!(crates.len(), 4);
+
+    // Verify crate names
+    let names: Vec<&str> = crates.iter().map(|c| c.name.as_str()).collect();
+    assert_eq!(names, vec!["api", "domain", "infrastructure", "common"]);
+
+    // Verify api is bin, others are lib
+    assert_eq!(crates[0].kind, "bin");
+    assert_eq!(crates[1].kind, "lib");
+    assert_eq!(crates[2].kind, "lib");
+    assert_eq!(crates[3].kind, "lib");
+
+    // Verify package names
+    assert_eq!(crates[0].package_name, "ctx-test-api");
+    assert_eq!(crates[1].package_name, "ctx-test-domain");
+
+    // Verify api depends on domain, infrastructure, common
+    assert!(crates[0].workspace_deps.contains(&"domain".to_string()));
+    assert!(
+        crates[0]
+            .workspace_deps
+            .contains(&"infrastructure".to_string())
+    );
+    assert!(crates[0].workspace_deps.contains(&"common".to_string()));
+
+    // Verify domain has no workspace deps
+    assert!(crates[1].workspace_deps.is_empty());
+
+    // Verify infrastructure depends on domain
+    assert_eq!(crates[2].workspace_deps, vec!["domain"]);
+}
+
+/// Test workspace_crates is None for single mode
+#[test]
+fn test_single_mode_no_workspace_crates() {
+    use axum_app_create::template::context::TemplateContext;
+
+    let config = ProjectConfig {
+        project_name: "single-test".to_string(),
+        mode: ProjectMode::Single,
+        ..Default::default()
+    };
+
+    let ctx = TemplateContext::from_config(&config);
+    assert!(!ctx.is_workspace);
+    assert!(ctx.workspace_crates.is_none());
 }
