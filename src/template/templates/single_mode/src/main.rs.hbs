@@ -3,6 +3,7 @@ use axum::Router;
 #[path = "config.rs"]
 mod config;
 {{#if has_database}}
+#[allow(dead_code)]
 #[path = "db.rs"]
 mod db;
 {{/if}}
