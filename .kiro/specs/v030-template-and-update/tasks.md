@@ -45,36 +45,36 @@ This plan breaks down the three v0.3.0 features (Custom Template System, Templat
 - [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass (including existing 70 tests), ask the user if questions arise.
 
-- [ ] 5. Implement custom template loader
-  - [ ] 5.1 Create `src/template/custom_loader.rs` with `CustomTemplateLoader` struct
+- [x] 5. Implement custom template loader
+  - [x] 5.1 Create `src/template/custom_loader.rs` with `CustomTemplateLoader` struct
     - Implement `load(dir: &Path) -> Result<HashMap<String, String>>` to recursively scan `.hbs` files
     - Validate directory exists, handle empty directory case
     - _Requirements: 1.1, 1.5, 1.6_
-  - [ ] 5.2 Create `src/template/resolver.rs` with `TemplateResolver` struct
+  - [x] 5.2 Create `src/template/resolver.rs` with `TemplateResolver` struct
     - Implement `resolve(mode, ci_enabled) -> Result<HashMap<String, ResolvedTemplate>>`
     - Merge built-in templates with custom templates: custom overrides matching paths, adds new paths
     - Define `ResolvedTemplate` struct
     - _Requirements: 1.2, 1.3, 2.5_
-  - [ ] 5.3 Write property test for template resolution
+  - [x] 5.3 Write property test for template resolution
     - **Property 1: Template resolution override and merge**
     - Generate random built-in and custom template sets, verify merge correctness
     - **Validates: Requirements 1.2, 1.3, 2.5**
 
-- [ ] 6. Implement template inheritance system
-  - [ ] 6.1 Create `src/template/inheritance.rs` with `InheritanceProcessor` struct
+- [x] 6. Implement template inheritance system
+  - [x] 6.1 Create `src/template/inheritance.rs` with `InheritanceProcessor` struct
     - Implement `parse_extends(content: &str) -> Option<String>` to extract extends directive
     - Implement `parse_overrides(content: &str) -> HashMap<String, String>` to extract override blocks
     - Implement `apply_inheritance(base_content: &str, overrides: &HashMap<String, String>) -> Result<String>`
     - _Requirements: 2.1, 2.3, 2.4, 2.7, 2.8, 2.9_
-  - [ ] 6.2 Write property test for extends directive parsing
+  - [x] 6.2 Write property test for extends directive parsing
     - **Property 3: Extends directive parsing**
     - Generate random path strings, construct extends directives, verify parsing
     - **Validates: Requirements 2.1**
-  - [ ] 6.3 Write property test for block inheritance
+  - [x] 6.3 Write property test for block inheritance
     - **Property 2: Block default content preservation in inheritance**
     - Generate random base templates with blocks and child templates with partial overrides, verify merge
     - **Validates: Requirements 2.2, 2.3, 2.4, 2.9**
-  - [ ] 6.4 Integrate `InheritanceProcessor` into `TemplateResolver::resolve()`
+  - [x] 6.4 Integrate `InheritanceProcessor` into `TemplateResolver::resolve()`
     - After merging custom templates, process extends directives for templates that have them
     - _Requirements: 2.1, 2.5_
 
