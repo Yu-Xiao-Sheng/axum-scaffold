@@ -128,7 +128,7 @@ pub struct FeatureSet {
 }
 
 /// Database configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DatabaseConfig {
     /// Database type selected
     pub option: DatabaseOption,
@@ -158,7 +158,7 @@ impl Default for DatabaseConfig {
 }
 
 /// Authentication configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AuthConfig {
     /// JWT secret (for .env.example only, not real secret)
     pub example_secret: String,
@@ -185,7 +185,7 @@ impl Default for AuthConfig {
 }
 
 /// Logging configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct LoggingConfig {
     /// Default log level
     pub default_level: String,
@@ -212,7 +212,7 @@ impl Default for LoggingConfig {
 }
 
 /// Business error configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BizErrorConfig {
     /// Include example error codes
     pub include_examples: bool,
@@ -236,7 +236,7 @@ impl Default for BizErrorConfig {
 }
 
 /// Project configuration for generation
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ProjectConfig {
     /// Project name (validated)
     pub project_name: String,
