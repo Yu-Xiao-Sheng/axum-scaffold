@@ -78,25 +78,25 @@ This plan breaks down the three v0.3.0 features (Custom Template System, Templat
     - After merging custom templates, process extends directives for templates that have them
     - _Requirements: 2.1, 2.5_
 
-- [ ] 7. Refactor built-in templates with block definitions
-  - [ ] 7.1 Add `{{#block "name"}}...{{/block}}` markers to `single_mode/src/main.rs.hbs`
+- [x] 7. Refactor built-in templates with block definitions
+  - [x] 7.1 Add `{{#block "name"}}...{{/block}}` markers to `single_mode/src/main.rs.hbs`
     - Define blocks: `imports`, `config`, `routes`, `middleware`, `main_body`
     - _Requirements: 3.1_
-  - [ ] 7.2 Add block markers to `workspace_mode/api/src/main.rs.hbs`
+  - [x] 7.2 Add block markers to `workspace_mode/api/src/main.rs.hbs`
     - Same block set as single mode
     - _Requirements: 3.2_
-  - [ ] 7.3 Add `dependencies` and `dev_dependencies` blocks to `Cargo.toml.hbs` templates (single and workspace)
+  - [x] 7.3 Add `dependencies` and `dev_dependencies` blocks to `Cargo.toml.hbs` templates (single and workspace)
     - _Requirements: 3.3_
-  - [ ] 7.4 Register `block` and `override` as custom Handlebars helpers in `src/template/engine.rs`
+  - [x] 7.4 Register `block` and `override` as custom Handlebars helpers in `src/template/engine.rs`
     - `block` helper: renders default content, can be replaced by override
     - `override` helper: stores content for later replacement
     - _Requirements: 2.2, 2.6, 3.5_
-  - [ ] 7.5 Write property test for block refactoring backward compatibility
+  - [x] 7.5 Write property test for block refactoring backward compatibility
     - **Property 4: Block refactoring backward compatibility**
     - For multiple ProjectConfig combinations, verify block-refactored templates produce identical output
     - **Validates: Requirements 3.4, 9.1, 9.2, 9.4**
 
-- [ ] 8. Checkpoint - Ensure all tests pass
+- [x] 8. Checkpoint - Ensure all tests pass
   - Ensure all tests pass (especially backward compatibility), ask the user if questions arise.
 
 - [ ] 9. Implement generation metadata
