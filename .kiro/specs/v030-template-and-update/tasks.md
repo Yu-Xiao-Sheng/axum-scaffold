@@ -8,41 +8,41 @@ This plan breaks down the three v0.3.0 features (Custom Template System, Templat
 
 ## Tasks
 
-- [ ] 1. Add new dependencies and update version
-  - [ ] 1.1 Update `Cargo.toml`: bump version to `0.3.0`, add `sha2 = "0.10"`, `toml = "0.8"`, `similar = "2"`, `dirs = "6"`
+- [x] 1. Add new dependencies and update version
+  - [x] 1.1 Update `Cargo.toml`: bump version to `0.3.0`, add `sha2 = "0.10"`, `toml = "0.8"`, `similar = "2"`, `dirs = "6"`
     - _Requirements: 8.6_
-  - [ ] 1.2 Update version string in `src/main.rs` CLI command attribute to `0.3.0`
+  - [x] 1.2 Update version string in `src/main.rs` CLI command attribute to `0.3.0`
     - _Requirements: 8.6_
 
-- [ ] 2. Implement SHA-256 checksum calculator
-  - [ ] 2.1 Create `src/updater/checksum.rs` with `ChecksumCalculator` struct
+- [x] 2. Implement SHA-256 checksum calculator
+  - [x] 2.1 Create `src/updater/checksum.rs` with `ChecksumCalculator` struct
     - Implement `calculate(content: &[u8]) -> String` using `sha2` crate
     - Implement `calculate_all(project_dir: &Path, files: &[String]) -> Result<HashMap<String, String>>`
     - _Requirements: 6.1, 6.2, 6.3_
-  - [ ] 2.2 Write property test for SHA-256 checksum determinism
+  - [x] 2.2 Write property test for SHA-256 checksum determinism
     - **Property 5: SHA-256 checksum determinism**
     - Generate random byte sequences, verify `calculate` returns same result on repeated calls and different results for different inputs
     - **Validates: Requirements 6.1, 6.2, 6.3**
-  - [ ] 2.3 Create `src/updater/mod.rs` to expose the updater module
+  - [x] 2.3 Create `src/updater/mod.rs` to expose the updater module
     - _Requirements: 6.1_
 
-- [ ] 3. Implement user configuration file loader
-  - [ ] 3.1 Create `src/config/user_config.rs` with `UserConfig` struct and `load()` method
+- [x] 3. Implement user configuration file loader
+  - [x] 3.1 Create `src/config/user_config.rs` with `UserConfig` struct and `load()` method
     - Parse `~/.axum-app-create.toml` using `toml` crate and `dirs` crate for home directory
     - Return `Default` on missing file or parse error (with warning on invalid TOML)
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
-  - [ ] 3.2 Write property test for user config parsing
+  - [x] 3.2 Write property test for user config parsing
     - **Property 12: User config parsing**
     - Generate random valid TOML strings with `template_dir`, verify correct parsing; generate invalid TOML, verify default returned
     - **Validates: Requirements 7.2, 7.3, 7.4**
-  - [ ] 3.3 Wire `UserConfig::load()` into `src/main.rs` startup, pass `template_dir` to generation flow
+  - [x] 3.3 Wire `UserConfig::load()` into `src/main.rs` startup, pass `template_dir` to generation flow
     - _Requirements: 7.1, 7.5_
-  - [ ] 3.4 Write property test for configuration priority
+  - [x] 3.4 Write property test for configuration priority
     - **Property 13: Configuration priority**
     - Generate random CLI/config/default value combinations, verify CLI > config > default
     - **Validates: Requirements 1.10, 7.5**
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass (including existing 70 tests), ask the user if questions arise.
 
 - [ ] 5. Implement custom template loader

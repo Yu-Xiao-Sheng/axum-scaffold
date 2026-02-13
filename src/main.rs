@@ -3,6 +3,7 @@
 // This tool generates new Axum projects with sensible defaults and optional features.
 
 use axum_app_create::cli::{is_non_interactive, prompts::prompt_project_config};
+use axum_app_create::config::user_config::UserConfig;
 use axum_app_create::config::{DatabaseOption, Preset, ProjectMode};
 use axum_app_create::error::CliError;
 use axum_app_create::generator::project::{generate_project, get_success_message_with_config};
@@ -14,7 +15,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(name = "axum-app-create")]
 #[command(about = "Scaffold a new Axum web application", long_about = None)]
-#[command(version = "0.2.0")]
+#[command(version = "0.3.0")]
 struct CliArgs {
     /// Project name (positional argument or --project-name)
     #[arg(value_name = "PROJECT_NAME")]
@@ -91,7 +92,10 @@ fn main() -> anyhow::Result<()> {
 
     let args = CliArgs::parse();
 
-    println!("\n🦀 axum-app-create CLI Tool v0.2.0");
+    println!("\n🦀 axum-app-create CLI Tool v0.3.0");
+
+    // Load user configuration file
+    let _user_config = UserConfig::load();
 
     // Check Rust toolchain
     if let Err(e) = check_rust_toolchain() {

@@ -4,6 +4,8 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod user_config;
+
 /// Database option selection
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum DatabaseOption {
