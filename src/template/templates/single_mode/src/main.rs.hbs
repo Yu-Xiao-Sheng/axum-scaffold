@@ -31,9 +31,18 @@ async fn main() -> anyhow::Result<()> {
     let config = Config::from_env()?;
 
 {{#if has_database}}
-    // TODO: Initialize database connection pool
-    // let pool = db::DbPool::from_env().await?;
-    // pool.run_migrations().await?;
+    // Initialize database connection pool
+    if let Some(ref db_url) = config.database_url {
+        tracing::info!("Database URL configured: {}...", &db_url[..db_url.len().min(20)]);
+        // TODO: Initialize connection pool
+        // let pool = db::DbPool::connect(db_url).await?;
+        // pool.run_migrations().await?;
+    }
+{{/if}}
+{{#if has_auth}}
+    if config.jwt_secret.is_some() {
+        tracing::info!("JWT authentication enabled");
+    }
 {{/if}}
 
     // Build our application with routes
