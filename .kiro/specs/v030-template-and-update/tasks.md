@@ -167,23 +167,23 @@ This plan breaks down the three v0.3.0 features (Custom Template System, Templat
 - [x] 13. Checkpoint - Ensure all tests pass
   - Ensure all tests pass (all 70 existing + new tests), ask the user if questions arise.
 
-- [ ] 14. Integration tests for new features
-  - [ ] 14.1 Write integration test: generate project with custom template directory overriding a built-in template
+- [x] 14. Integration tests for new features
+  - [x] 14.1 Write integration test: generate project with custom template directory overriding a built-in template
     - Verify custom content appears in output
     - _Requirements: 1.1, 1.2_
-  - [ ] 14.2 Write integration test: generate project with template inheritance (extends + override blocks)
+  - [x] 14.2 Write integration test: generate project with template inheritance (extends + override blocks)
     - Verify override blocks replace base content, non-overridden blocks retain defaults
     - _Requirements: 2.1, 2.3, 2.4_
-  - [ ] 14.3 Write integration test: generate project then update with no changes (all files skipped)
+  - [x] 14.3 Write integration test: generate project then update with no changes (all files skipped)
     - _Requirements: 4.5_
-  - [ ] 14.4 Write integration test: generate project, modify a file, update with conflict detection
+  - [x] 14.4 Write integration test: generate project, modify a file, update with conflict detection
     - _Requirements: 4.7, 6.3_
-  - [ ] 14.5 Write integration test: init-template exports templates, use them as custom templates to generate identical project
+  - [x] 14.5 Write integration test: init-template exports templates, use them as custom templates to generate identical project
     - _Requirements: 1.7, 1.8_
-  - [ ] 14.6 Write integration test: backward compatibility — all v0.2.0 argument combinations produce same results
+  - [x] 14.6 Write integration test: backward compatibility — all v0.2.0 argument combinations produce same results
     - _Requirements: 9.1, 9.2_
 
-- [ ] 15. Final checkpoint - Ensure all tests pass
+- [-] 15. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes / 备注
