@@ -5,7 +5,9 @@
 
 use crate::config::ProjectMode;
 use crate::error::{CliError, Result};
-use crate::template::templates::{get_ci_templates, get_single_mode_templates, get_workspace_mode_templates};
+use crate::template::templates::{
+    get_ci_templates, get_single_mode_templates, get_workspace_mode_templates,
+};
 use std::path::Path;
 
 /// Template exporter: writes built-in templates to filesystem
@@ -17,7 +19,11 @@ impl TemplateExporter {
     /// Each template is written with its registry key + `.hbs` extension,
     /// preserving the directory structure.
     pub fn export(mode: ProjectMode, output_dir: &Path) -> Result<()> {
-        if output_dir.exists() && std::fs::read_dir(output_dir).map(|mut d| d.next().is_some()).unwrap_or(false) {
+        if output_dir.exists()
+            && std::fs::read_dir(output_dir)
+                .map(|mut d| d.next().is_some())
+                .unwrap_or(false)
+        {
             return Err(CliError::Config(format!(
                 "❌ 输出目录非空 / Output directory is not empty: '{}'\n\
                  💡 请使用空目录或不存在的目录 / Please use an empty or non-existent directory",
@@ -51,7 +57,9 @@ impl TemplateExporter {
 
         println!(
             "✅ 已导出 {} 个模板到 / Exported {} templates to: {}",
-            count, count, output_dir.display()
+            count,
+            count,
+            output_dir.display()
         );
 
         Ok(())
@@ -102,7 +110,9 @@ mod tests {
 mod proptests {
     use super::*;
     use crate::template::custom_loader::CustomTemplateLoader;
-    use crate::template::templates::{get_single_mode_templates, get_workspace_mode_templates, get_ci_templates};
+    use crate::template::templates::{
+        get_ci_templates, get_single_mode_templates, get_workspace_mode_templates,
+    };
     use proptest::prelude::*;
     use tempfile::TempDir;
 

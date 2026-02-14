@@ -31,7 +31,9 @@ pub struct TemplateResolver {
 
 impl TemplateResolver {
     pub fn new(custom_template_dir: Option<PathBuf>) -> Self {
-        Self { custom_template_dir }
+        Self {
+            custom_template_dir,
+        }
     }
 
     /// Resolve the final template set
@@ -130,10 +132,7 @@ impl TemplateResolver {
     }
 
     /// Get the built-in templates as a HashMap<key, content> for inheritance lookups
-    pub fn get_builtin_templates(
-        mode: ProjectMode,
-        ci_enabled: bool,
-    ) -> HashMap<String, String> {
+    pub fn get_builtin_templates(mode: ProjectMode, ci_enabled: bool) -> HashMap<String, String> {
         let mut builtin = match mode {
             ProjectMode::Single => get_single_mode_templates(),
             ProjectMode::Workspace => get_workspace_mode_templates(),
@@ -206,11 +205,7 @@ mod tests {
     #[test]
     fn test_resolver_with_custom_dir() {
         let temp = tempfile::TempDir::new().unwrap();
-        std::fs::write(
-            temp.path().join("Cargo.toml.hbs"),
-            "custom cargo content",
-        )
-        .unwrap();
+        std::fs::write(temp.path().join("Cargo.toml.hbs"), "custom cargo content").unwrap();
 
         let resolver = TemplateResolver::new(Some(temp.path().to_path_buf()));
         let result = resolver.resolve(ProjectMode::Single, false).unwrap();
@@ -233,8 +228,8 @@ mod tests {
 #[cfg(test)]
 mod proptests {
     use super::*;
-    use proptest::prelude::*;
     use proptest::collection::hash_map;
+    use proptest::prelude::*;
 
     fn template_key() -> impl Strategy<Value = String> {
         "[a-z][a-z0-9_/]{0,20}".prop_map(|s| s)

@@ -171,18 +171,12 @@ fn register_custom_helpers(handlebars: &mut Handlebars) {
     // Helper: block
     // In normal rendering (no inheritance), just renders the default content inside the block.
     // During inheritance, InheritanceProcessor handles block replacement before Handlebars renders.
-    handlebars.register_helper(
-        "block",
-        Box::new(BlockHelper),
-    );
+    handlebars.register_helper("block", Box::new(BlockHelper));
 
     // Helper: override
     // This is a no-op during normal Handlebars rendering.
     // Override blocks are processed by InheritanceProcessor before rendering.
-    handlebars.register_helper(
-        "override",
-        Box::new(OverrideHelper),
-    );
+    handlebars.register_helper("override", Box::new(OverrideHelper));
 
     // Helper: to_snake_case
     // Converts a string to snake_case

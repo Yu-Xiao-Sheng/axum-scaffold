@@ -1155,10 +1155,8 @@ fn test_init_template_roundtrip() {
 
     // Compare key files — they should be identical
     for file in &["Cargo.toml", "src/main.rs", "src/lib.rs", "src/config.rs"] {
-        let builtin_content =
-            std::fs::read_to_string(project_builtin.join(file)).unwrap();
-        let custom_content =
-            std::fs::read_to_string(project_custom.join(file)).unwrap();
+        let builtin_content = std::fs::read_to_string(project_builtin.join(file)).unwrap();
+        let custom_content = std::fs::read_to_string(project_custom.join(file)).unwrap();
         assert_eq!(
             builtin_content, custom_content,
             "File {} should be identical between built-in and exported template generation",
@@ -1212,9 +1210,7 @@ fn test_backward_compatibility() {
 
         // v0.3.0 addition: metadata file should also be created
         assert!(
-            project_dir
-                .join(".axum-app-create.json")
-                .exists(),
+            project_dir.join(".axum-app-create.json").exists(),
             "Metadata file missing for {}",
             config.project_name
         );

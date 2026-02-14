@@ -81,10 +81,7 @@ impl MetadataManager {
     }
 
     /// Update metadata after an update operation
-    pub fn update(
-        project_dir: &Path,
-        file_checksums: HashMap<String, String>,
-    ) -> Result<()> {
+    pub fn update(project_dir: &Path, file_checksums: HashMap<String, String>) -> Result<()> {
         let mut metadata = Self::read(project_dir)?;
         metadata.version = env!("CARGO_PKG_VERSION").to_string();
         metadata.generated_at = chrono::Utc::now().to_rfc3339();
@@ -155,8 +152,8 @@ mod tests {
 #[cfg(test)]
 mod proptests {
     use super::*;
-    use proptest::prelude::*;
     use proptest::collection::hash_map;
+    use proptest::prelude::*;
 
     fn arb_metadata() -> impl Strategy<Value = GenerationMetadata> {
         (

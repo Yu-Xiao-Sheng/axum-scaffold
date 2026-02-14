@@ -29,10 +29,7 @@ impl ChecksumCalculator {
     ///
     /// # Returns
     /// HashMap mapping relative file path to its SHA-256 checksum
-    pub fn calculate_all(
-        project_dir: &Path,
-        files: &[String],
-    ) -> Result<HashMap<String, String>> {
+    pub fn calculate_all(project_dir: &Path, files: &[String]) -> Result<HashMap<String, String>> {
         let mut checksums = HashMap::new();
         for file in files {
             let file_path = project_dir.join(file);
@@ -78,14 +75,8 @@ mod tests {
         let checksums = ChecksumCalculator::calculate_all(temp_dir.path(), &files).unwrap();
 
         assert_eq!(checksums.len(), 2);
-        assert_eq!(
-            checksums["a.txt"],
-            ChecksumCalculator::calculate(b"hello")
-        );
-        assert_eq!(
-            checksums["b.txt"],
-            ChecksumCalculator::calculate(b"world")
-        );
+        assert_eq!(checksums["a.txt"], ChecksumCalculator::calculate(b"hello"));
+        assert_eq!(checksums["b.txt"], ChecksumCalculator::calculate(b"world"));
     }
 
     #[test]

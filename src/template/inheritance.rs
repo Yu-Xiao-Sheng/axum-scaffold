@@ -22,12 +22,12 @@ impl InheritanceProcessor {
             if trimmed.is_empty() {
                 continue;
             }
-            if let Some(rest) = trimmed.strip_prefix("{{!--") {
-                if let Some(rest) = rest.strip_suffix("--}}") {
-                    let inner = rest.trim();
-                    if let Some(path) = inner.strip_prefix("extends:") {
-                        return Some(path.trim().to_string());
-                    }
+            if let Some(rest) = trimmed.strip_prefix("{{!--")
+                && let Some(rest) = rest.strip_suffix("--}}")
+            {
+                let inner = rest.trim();
+                if let Some(path) = inner.strip_prefix("extends:") {
+                    return Some(path.trim().to_string());
                 }
             }
             // Only check the first non-empty line for extends
@@ -64,10 +64,8 @@ impl InheritanceProcessor {
                         // Find {{/override}}
                         let end_tag = "{{/override}}";
                         if let Some(end_pos) = content[content_start..].find(end_tag) {
-                            let block_content =
-                                &content[content_start..content_start + end_pos];
-                            overrides
-                                .insert(name.to_string(), block_content.to_string());
+                            let block_content = &content[content_start..content_start + end_pos];
+                            overrides.insert(name.to_string(), block_content.to_string());
                             i = content_start + end_pos + end_tag.len();
                             continue;
                         }

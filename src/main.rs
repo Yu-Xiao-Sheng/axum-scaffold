@@ -4,7 +4,7 @@
 // v0.3.0 introduces subcommands: new, init-template, update
 
 use axum_app_create::cli::{is_non_interactive, prompts::prompt_project_config};
-use axum_app_create::config::user_config::{resolve_template_dir, UserConfig};
+use axum_app_create::config::user_config::{UserConfig, resolve_template_dir};
 use axum_app_create::config::{DatabaseOption, Preset, ProjectMode};
 use axum_app_create::error::CliError;
 use axum_app_create::generator::project::get_success_message_with_config;
@@ -12,7 +12,7 @@ use axum_app_create::template::exporter::TemplateExporter;
 use axum_app_create::updater::engine::UpdateEngine;
 use axum_app_create::utils::rust_toolchain::check_rust_toolchain;
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Simple CLI tool to scaffold Axum web applications
 #[derive(Parser, Debug)]
@@ -181,9 +181,7 @@ fn main() -> anyhow::Result<()> {
     let user_config = UserConfig::load();
 
     match cli.command {
-        Some(Commands::InitTemplate { output_dir, mode }) => {
-            run_init_template(&output_dir, &mode)
-        }
+        Some(Commands::InitTemplate { output_dir, mode }) => run_init_template(&output_dir, &mode),
         Some(Commands::Update {
             project_dir,
             dry_run,
@@ -225,8 +223,7 @@ fn main() -> anyhow::Result<()> {
         }
         None => {
             // Backward compatibility: no subcommand = `new`
-            let resolved_dir =
-                resolve_template_dir(cli.template_dir, &user_config);
+            let resolved_dir = resolve_template_dir(cli.template_dir, &user_config);
             run_new(
                 cli.project_name,
                 cli.author,
@@ -245,7 +242,7 @@ fn main() -> anyhow::Result<()> {
     }
 }
 
-fn run_init_template(output_dir: &PathBuf, mode: &str) -> anyhow::Result<()> {
+fn run_init_template(output_dir: &Path, mode: &str) -> anyhow::Result<()> {
     let project_mode = match mode {
         "single" => ProjectMode::Single,
         "workspace" => ProjectMode::Workspace,
@@ -280,7 +277,7 @@ fn run_init_template(output_dir: &PathBuf, mode: &str) -> anyhow::Result<()> {
 }
 
 fn run_update(
-    project_dir: &PathBuf,
+    project_dir: &Path,
     dry_run: bool,
     force: bool,
     template_dir: Option<PathBuf>,
@@ -289,7 +286,7 @@ fn run_update(
         println!("🔍 Dry-run 模式 / Dry-run mode: 不会修改任何文件 / No files will be modified");
     }
 
-    let engine = UpdateEngine::new(project_dir.clone(), dry_run, force, template_dir);
+    let engine = UpdateEngine::new(project_dir.to_path_buf(), dry_run, force, template_dir);
 
     match engine.update(true) {
         Ok(report) => {
@@ -300,9 +297,7 @@ fn run_update(
                 for f in &report.files_conflicted {
                     println!("  ⚠️  {}", f);
                 }
-                println!(
-                    "\n💡 使用 --force 强制覆盖 / Use --force to overwrite all files"
-                );
+                println!("\n💡 使用 --force 强制覆盖 / Use --force to overwrite all files");
             }
         }
         Err(e) => {

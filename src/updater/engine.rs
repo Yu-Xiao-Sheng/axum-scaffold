@@ -416,7 +416,11 @@ mod integration_proptests {
                     }
                     walk_recursive(base, &path, files);
                 } else {
-                    let rel = path.strip_prefix(base).unwrap().to_string_lossy().to_string();
+                    let rel = path
+                        .strip_prefix(base)
+                        .unwrap()
+                        .to_string_lossy()
+                        .to_string();
                     if let Ok(content) = std::fs::read(&path) {
                         files.insert(rel, content);
                     }

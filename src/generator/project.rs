@@ -521,16 +521,13 @@ mod proptests {
                     ..Default::default()
                 };
                 if db.is_enabled() {
-                    config.database =
-                        Some(crate::config::DatabaseConfig::default());
+                    config.database = Some(crate::config::DatabaseConfig::default());
                 }
                 if auth {
-                    config.authentication =
-                        Some(crate::config::AuthConfig::default());
+                    config.authentication = Some(crate::config::AuthConfig::default());
                 }
                 if biz_error {
-                    config.biz_error =
-                        Some(crate::config::BizErrorConfig::default());
+                    config.biz_error = Some(crate::config::BizErrorConfig::default());
                 }
                 config
             })
