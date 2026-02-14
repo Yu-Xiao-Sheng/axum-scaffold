@@ -183,7 +183,7 @@ This plan breaks down the three v0.3.0 features (Custom Template System, Templat
   - [x] 14.6 Write integration test: backward compatibility — all v0.2.0 argument combinations produce same results
     - _Requirements: 9.1, 9.2_
 
-- [-] 15. Final checkpoint - Ensure all tests pass
+- [x] 15. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes / 备注
